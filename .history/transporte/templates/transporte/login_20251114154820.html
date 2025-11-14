@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logística Global</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .welcome-section {
+            flex: 1;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,192C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo-icon i {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .features {
+            margin-top: 40px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .feature-icon i {
+            font-size: 18px;
+            color: white;
+        }
+        
+        .feature-text h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .feature-text p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-container {
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        
+        .form-title {
+            font-size: 24px;
+            color: #1e3a8a;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            padding: 14px 16px 14px 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background-color: #f8fafc;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 18px;
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        
+        .remember {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember input {
+            margin-right: 8px;
+            accent-color: #1e3a8a;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+        }
+        
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .toggle-form a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+        
+        .form-toggle {
+            display: none;
+        }
+        
+        #create-account-form {
+            display: none;
+        }
+        
+        #create-account:checked ~ #create-account-form {
+            display: block;
+        }
+        
+        #create-account:checked ~ #login-form {
+            display: none;
+        }
+        
+        .name-fields {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .name-fields .form-group {
+            flex: 1;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 450px;
+            }
+            
+            .welcome-section {
+                padding: 30px 25px;
+            }
+            
+            .form-section {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Logística Global</h1>
+                        <p>Gestión integral de transporte</p>
+                    </div>
+                </div>
+                
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Gestión de Flota</h3>
+                            <p>Controla tu flota de vehículos en tiempo real</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Transporte Aéreo</h3>
+                            <p>Gestión eficiente de aeronaves y rutas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Reportes Avanzados</h3>
+                            <p>Analiza el rendimiento de tus operaciones</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-container">
+                <input type="checkbox" id="create-account" class="form-toggle">
+                
+                <!-- Mensajes de Django -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Formulario de Login -->
+                <div id="login-form">
+                    <h2 class="form-title">Iniciar Sesión</h2>
+                    
+                    <form method="POST" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="username">Usuario</label>
+                            <div class="input-container">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="username" name="username" placeholder="Nombre de usuario" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <div class="input-container">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="password" name="password" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        
+                        <div class="options">
+                            <div class="remember">
+                                <input type="checkbox" id="remember" name="remember">
+                                <label for="remember">Recordar sesión</label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            INICIAR SESIÓN
+                        </button>
+                    </form>
+                    
+                    <div class="toggle-form">
+                        ¿No tienes una cuenta? 
+                        <label for="create-account" class="toggle-link">Crear Cuenta</label>
+                    </div>
+                </div>
+                
+                <!-- Formulario de Crear Cuenta -->
+                <div id="create-account-form">
+                    <h2 class="form-title">Crear Cuenta</h2>
+                    
+                    <form method="POST" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        <div class="name-fields">
+                            <div class="form-group">
+                                <label for="first_name">Nombre</label>
+                                <div class="input-container">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" id="first_name" name="first_name" placeholder="Juan" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="last_name">Apellido</label>
+                                <div class="input-container">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" id="last_name" name="last_name" placeholder="Pérez" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="username">Nombre de Usuario</label>
+                            <div class="input-container">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="username" name="username" placeholder="juanperez" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Correo Electrónico</label>
+                            <div class="input-container">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="email" name="email" placeholder="usuario@ejemplo.com" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password1">Contraseña</label>
+                            <div class="input-container">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="password1" name="password1" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password2">Confirmar Contraseña</label>
+                            <div class="input-container">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="password2" name="password2" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="login-btn">
+                            <i class="fas fa-user-plus"></i>
+                            CREAR CUENTA
+                        </button>
+                    </form>
+                    
+                    <div class="toggle-form">
+                        ¿Ya tienes una cuenta? 
+                        <label for="create-account" class="toggle-link">Iniciar Sesión</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cambiar entre formularios
+        document.getElementById('create-account').addEventListener('change', function() {
+            if(this.checked) {
+                document.querySelector('.toggle-form label').textContent = 'Iniciar Sesión';
+            } else {
+                document.querySelector('.toggle-form label').textContent = 'Crear Cuenta';
+            }
+        });
+
+        // Limpiar mensajes después de 5 segundos
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
+============================================================
+
+
+===== pilotos.html =====
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilotos - Sistema de Gestión de Transporte</title>
+    <style>
+        /* Todos los estilos del dashboard original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.vacations {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .badge.license {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.inactive {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .badge.atpl {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.cpl {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .badge.ppl {
+            background: rgba(14, 165, 233, 0.2);
+            color: #38bdf8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.6rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select, .search-input {
+                min-width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 800px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">✈️</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                <div>
+                    <div style="font-weight: 600;">Admin Usuario</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Administrador del Sistema</div>
+                </div>
+                <div class="avatar">AU</div>
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <div class="page-title">
+            <span>👨‍✈️</span>
+            <span>Gestión de Pilotos</span>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <select class="filter-select" id="filter-status">
+                    <option value="">Todos los estados</option>
+                    <option value="active">Activo</option>
+                    <option value="inactive">Inactivo</option>
+                </select>
+                <select class="filter-select" id="filter-license">
+                    <option value="">Todos los tipos</option>
+                    <option value="ATPL">ATPL</option>
+                    <option value="CPL">CPL</option>
+                    <option value="PPL">PPL</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar piloto...">
+            <button class="btn" id="new-pilot-btn">➕ Nuevo Piloto</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Pilotos</div>
+                <div id="pilot-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Certificación</th>
+                        <th>Horas de Vuelo</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="pilots-table-body">
+                    <tr>
+                        <td colspan="7" class="loading">Cargando datos de pilotos desde la base de datos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="newPilotoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('newPilotoModal')">&times;</span>
+            <h3>Nuevo Piloto</h3>
+            <form id="newPilotoForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Nombre Completo</label>
+                    <input type="text" class="form-input" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">RUT</label>
+                        <input type="text" class="form-input" id="rut" name="rut" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Certificación</label>
+                        <input type="text" class="form-input" id="certificacion" name="certificacion" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" class="form-input" id="telefono" name="telefono" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Horas de Vuelo</label>
+                    <input type="number" class="form-input" id="horas_vuelo" name="horas_vuelo" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="activo" name="activo" checked> Activo
+                    </label>
+                </div>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newPilotoModal')">Cancelar</button>
+                    <button type="submit" class="btn">Crear Piloto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewPilotoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('viewPilotoModal')">&times;</span>
+            <h3 id="viewPilotoTitle">Detalles del Piloto</h3>
+            <div id="viewPilotoContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variable global para almacenar los pilotos
+        let pilotsData = [];
+
+        // Función para cargar pilotos desde la base de datos
+        async function loadPilotsFromDatabase() {
+            try {
+                showLoadingState();
+                
+                // Llamada real a la API de Django
+                const response = await fetch('/api/pilotos/');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar los pilotos');
+                }
+                
+                pilotsData = await response.json();
+                renderPilotsTable(pilotsData);
+                showNotification('Datos de pilotos cargados correctamente');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorState('Error al cargar los pilotos: ' + error.message);
+            }
+        }
+
+        // Función para mostrar estado de carga
+        function showLoadingState() {
+            const tableBody = document.getElementById('pilots-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading">Cargando datos de pilotos desde la base de datos...</td>
+                </tr>
+            `;
+            document.getElementById('pilot-count').textContent = 'Cargando...';
+        }
+
+        // Función para mostrar estado de error
+        function showErrorState(message) {
+            const tableBody = document.getElementById('pilots-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="error">
+                            ${message}
+                            <br>
+                            <button class="btn" onclick="loadPilotsFromDatabase()" style="margin-top: 1rem;">
+                                Reintentar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('pilot-count').textContent = 'Error';
+        }
+
+        // Función para renderizar la tabla de pilotos
+        function renderPilotsTable(pilots) {
+            const tableBody = document.getElementById('pilots-table-body');
+            const pilotCount = document.getElementById('pilot-count');
+            
+            if (pilots.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="loading">No se encontraron pilotos en la base de datos</td>
+                    </tr>
+                `;
+                pilotCount.textContent = 'Total: 0 pilotos';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            pilotCount.textContent = `Total: ${pilots.length} pilotos`;
+            
+            pilots.forEach(pilot => {
+                const row = document.createElement('tr');
+                
+                // USAR CAMPOS REALES DE LA BASE DE DATOS
+                // Estado basado en el campo 'activo' (booleano)
+                let statusClass = '';
+                let statusText = '';
+                
+                if (pilot.activo) {
+                    statusClass = 'active';
+                    statusText = 'Activo';
+                } else {
+                    statusClass = 'inactive';
+                    statusText = 'Inactivo';
+                }
+
+                // Certificación basada en el campo 'certificacion'
+                let licenseClass = '';
+                let licenseText = pilot.certificacion || 'N/A';
+                
+                // Mapear certificaciones a clases CSS existentes
+                if (licenseText.includes('ATPL')) {
+                    licenseClass = 'atpl';
+                } else if (licenseText.includes('CPL')) {
+                    licenseClass = 'cpl';
+                } else if (licenseText.includes('PPL')) {
+                    licenseClass = 'ppl';
+                } else {
+                    licenseClass = 'info';
+                }
+                
+                row.innerHTML = `
+                    <td>${pilot.id || 'N/A'}</td>
+                    <td>${pilot.nombre || 'N/A'}</td>
+                    <td><span class="badge ${licenseClass}">${licenseText}</span></td>
+                    <td>${pilot.horas_vuelo || 0} horas</td>
+                    <td>${pilot.telefono || 'N/A'}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="viewPilot(${pilot.id})">Ver</button>
+                        <button class="action-btn" onclick="editPilot(${pilot.id})">Editar</button>
+                        <button class="action-btn delete" onclick="deletePilot(${pilot.id})">Eliminar</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para filtrar pilotos
+        function filterPilots() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const licenseFilter = document.getElementById('filter-license').value;
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            
+            const filteredPilots = pilotsData.filter(pilot => {
+                // Filtro por estado (usando campo 'activo' real)
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && pilot.activo) ||
+                    (statusFilter === 'inactive' && !pilot.activo);
+                
+                // Filtro por certificación (usando campo 'certificacion' real)
+                const matchesLicense = !licenseFilter || 
+                    (pilot.certificacion && pilot.certificacion.includes(licenseFilter));
+                
+                // Filtro por búsqueda
+                const matchesSearch = !searchText || 
+                    (pilot.nombre && pilot.nombre.toLowerCase().includes(searchText)) ||
+                    (pilot.certificacion && pilot.certificacion.toLowerCase().includes(searchText)) ||
+                    (pilot.telefono && pilot.telefono.toLowerCase().includes(searchText)) ||
+                    (pilot.id && pilot.id.toString().includes(searchText));
+                
+                return matchesStatus && matchesLicense && matchesSearch;
+            });
+            
+            renderPilotsTable(filteredPilots);
+        }
+
+        // Función para crear un nuevo piloto
+        async function createPilot(pilotData) {
+            try {
+                const response = await fetch('/api/pilotos/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify(pilotData)
+                });
+                
+                if (response.ok) {
+                    const newPilot = await response.json();
+                    return newPilot;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al crear el piloto');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            }
+        }
+
+        // Funciones de acción para los pilotos
+        async function viewPilot(pilotId) {
+            try {
+                const response = await fetch(`/api/pilotos/${pilotId}/`);
+                const pilotDetails = await response.json();
+                
+                showNotification(`Viendo detalles del piloto ${pilotId}`);
+                
+                // Mostrar detalles en modal
+                document.getElementById('viewPilotoTitle').textContent = `Detalles del Piloto #${pilotId}`;
+                document.getElementById('viewPilotoContent').innerHTML = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div><strong>ID:</strong> ${pilotDetails.id || 'N/A'}</div>
+                        <div><strong>Nombre:</strong> ${pilotDetails.nombre || 'N/A'}</div>
+                        <div><strong>RUT:</strong> ${pilotDetails.rut || 'N/A'}</div>
+                        <div><strong>Certificación:</strong> ${pilotDetails.certificacion || 'N/A'}</div>
+                        <div><strong>Teléfono:</strong> ${pilotDetails.telefono || 'N/A'}</div>
+                        <div><strong>Email:</strong> ${pilotDetails.email || 'N/A'}</div>
+                        <div><strong>Horas de Vuelo:</strong> ${pilotDetails.horas_vuelo || 0} horas</div>
+                        <div><strong>Estado:</strong> ${pilotDetails.activo ? 'Activo' : 'Inactivo'}</div>
+                    </div>
+                `;
+                showModal('viewPilotoModal');
+                
+            } catch (error) {
+                console.error('Error al obtener detalles:', error);
+                showNotification('Error al cargar detalles del piloto');
+            }
+        }
+
+        async function editPilot(pilotId) {
+            showNotification(`Editando el piloto ${pilotId}`);
+            // Redirigir a página de edición
+            window.location.href = `/pilotos/${pilotId}/editar/`;
+        }
+
+        async function deletePilot(pilotId) {
+            if (confirm('¿Está seguro de que desea eliminar este piloto?')) {
+                try {
+                    const response = await fetch(`/api/pilotos/${pilotId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        await loadPilotsFromDatabase();
+                        showNotification('Piloto eliminado correctamente');
+                    } else {
+                        throw new Error('Error al eliminar el piloto');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar el piloto');
+                }
+            }
+        }
+
+        // Función auxiliar para obtener el token CSRF
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Modal Functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Limpiar formulario al cerrar
+            if (modalId === 'newPilotoModal') {
+                document.getElementById('newPilotoForm').reset();
+            }
+        }
+
+        function showNewPilotoModal() {
+            showModal('newPilotoModal');
+        }
+
+        // Notification System
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.textContent = type === 'success' ? `✓ ${message}` : `✗ ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #6366f1, #06b6d4)' : 'linear-gradient(135deg, #ef4444, #dc2626)'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Inicialización cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPilotsFromDatabase();
+            
+            document.getElementById('filter-status').addEventListener('change', filterPilots);
+            document.getElementById('filter-license').addEventListener('change', filterPilots);
+            document.getElementById('search-input').addEventListener('input', filterPilots);
+            
+            document.getElementById('new-pilot-btn').addEventListener('click', showNewPilotoModal);
+            
+            // Configurar formulario de nuevo piloto
+            document.getElementById('newPilotoForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    // Recoger datos del formulario
+                    const pilotData = {
+                        nombre: document.getElementById('nombre').value,
+                        rut: document.getElementById('rut').value,
+                        certificacion: document.getElementById('certificacion').value,
+                        telefono: document.getElementById('telefono').value,
+                        email: document.getElementById('email').value,
+                        horas_vuelo: parseInt(document.getElementById('horas_vuelo').value),
+                        activo: document.getElementById('activo').checked
+                    };
+                    
+                    // Crear piloto en la base de datos
+                    const newPilot = await createPilot(pilotData);
+                    
+                    // Cerrar modal y mostrar mensaje
+                    closeModal('newPilotoModal');
+                    showNotification('Piloto creado exitosamente');
+                    
+                    // Recargar la tabla
+                    await loadPilotsFromDatabase();
+                    
+                } catch (error) {
+                    console.error('Error al crear piloto:', error);
+                    showNotification('Error al crear el piloto: ' + error.message, 'error');
+                }
+            });
+            
+            console.log('👨‍✈️ Módulo de Pilotos cargado exitosamente');
+        });
+
+        // Estilos para las animaciones de notificaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    // Limpiar formulario al cerrar
+                    if (modal.id === 'newPilotoModal') {
+                        document.getElementById('newPilotoForm').reset();
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Despacho {{ despacho.id }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📦</span>
+    <span>Despacho D-{{ despacho.id|stringformat:"04d" }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">ID Despacho</div>
+            <div class="detail-value">D-{{ despacho.id|stringformat:"04d" }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Cliente</div>
+            <div class="detail-value">{{ despacho.cliente.razon_social }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Ruta</div>
+            <div class="detail-value">{{ despacho.ruta.origen }} - {{ despacho.ruta.destino }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Tipo de Transporte</div>
+            <div class="detail-value">{{ despacho.ruta.get_tipo_transporte_display }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Carga</div>
+            <div class="detail-value">{{ despacho.carga.descripcion }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                <span class="badge {% if despacho.estado == 'ENTREGADO' %}active
+                                 {% elif despacho.estado == 'PENDIENTE' %}pending
+                                 {% elif despacho.estado == 'EN_RUTA' %}info
+                                 {% else %}alert{% endif %}">
+                    {{ despacho.get_estado_display }}
+                </span>
+            </div>
+        </div>
+
+        {% if despacho.vehiculo %}
+        <div class="detail-item">
+            <div class="detail-label">Vehículo</div>
+            <div class="detail-value">{{ despacho.vehiculo.patente }} - {{ despacho.vehiculo.modelo }}</div>
+        </div>
+        {% endif %}
+
+        {% if despacho.aeronave %}
+        <div class="detail-item">
+            <div class="detail-label">Aeronave</div>
+            <div class="detail-value">{{ despacho.aeronave.matricula }} - {{ despacho.aeronave.modelo }}</div>
+        </div>
+        {% endif %}
+
+        {% if despacho.conductor %}
+        <div class="detail-item">
+            <div class="detail-label">Conductor</div>
+            <div class="detail-value">{{ despacho.conductor.nombre }}</div>
+        </div>
+        {% endif %}
+
+        {% if despacho.piloto %}
+        <div class="detail-item">
+            <div class="detail-label">Piloto</div>
+            <div class="detail-value">{{ despacho.piloto.nombre }}</div>
+        </div>
+        {% endif %}
+
+        <div class="detail-item">
+            <div class="detail-label">Costo de Envío</div>
+            <div class="detail-value">${{ despacho.costo_envio }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Fecha de Despacho</div>
+            <div class="detail-value">{{ despacho.fecha_despacho|date:"d/m/Y H:i" }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'despacho_editar' despacho.pk %}" class="btn">Editar</a>
+        <a href="{% url 'despacho_eliminar' despacho.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'despachos' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

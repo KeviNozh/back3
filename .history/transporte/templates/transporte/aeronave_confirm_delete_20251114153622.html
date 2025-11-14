@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Aeronave {{ aeronave.matricula }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>✈️</span>
+    <span>Aeronave {{ aeronave.matricula }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">Matrícula</div>
+            <div class="detail-value">{{ aeronave.matricula }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Tipo de Aeronave</div>
+            <div class="detail-value">{{ aeronave.tipo_aeronave }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Modelo</div>
+            <div class="detail-value">{{ aeronave.modelo }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Capacidad</div>
+            <div class="detail-value">{{ aeronave.capacidad_kg }} kg</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Piloto Asignado</div>
+            <div class="detail-value">
+                {% if aeronave.piloto_asignado %}
+                    {{ aeronave.piloto_asignado.nombre }}
+                {% else %}
+                    <span style="color: var(--text-secondary);">Sin asignar</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                <span class="badge {% if aeronave.activo %}active{% else %}alert{% endif %}">
+                    {% if aeronave.activo %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Asignados</div>
+            <div class="detail-value">{{ aeronave.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'aeronave_edit' aeronave.pk %}" class="btn">Editar</a>
+        <a href="{% url 'aeronave_delete' aeronave.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'aeronaves' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

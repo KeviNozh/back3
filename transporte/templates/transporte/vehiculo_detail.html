@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Vehículo {{ vehiculo.patente }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🚛</span>
+    <span>Vehículo {{ vehiculo.patente }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">Patente</div>
+            <div class="detail-value">{{ vehiculo.patente }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Tipo de Vehículo</div>
+            <div class="detail-value">{{ vehiculo.tipo_vehiculo }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Modelo</div>
+            <div class="detail-value">{{ vehiculo.modelo }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Capacidad</div>
+            <div class="detail-value">{{ vehiculo.capacidad_kg }} kg</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Año</div>
+            <div class="detail-value">{{ vehiculo.año }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Conductor Asignado</div>
+            <div class="detail-value">
+                {% if vehiculo.conductor_asignado %}
+                    {{ vehiculo.conductor_asignado.nombre }}
+                {% else %}
+                    <span style="color: var(--text-secondary);">Sin asignar</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                <span class="badge {% if vehiculo.activo %}active{% else %}alert{% endif %}">
+                    {% if vehiculo.activo %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Asignados</div>
+            <div class="detail-value">{{ vehiculo.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'vehiculo_edit' vehiculo.pk %}" class="btn">Editar</a>
+        <a href="{% url 'vehiculo_delete' vehiculo.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'vehiculos' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

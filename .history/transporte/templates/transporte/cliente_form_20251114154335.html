@@ -1,0 +1,15 @@
+<!-- cliente_form.html -->
+lass="form-label" for="id_activo">
+                {{ form.activo }} Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Cliente
+            </button>
+            <a href="{% url 'clientes' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

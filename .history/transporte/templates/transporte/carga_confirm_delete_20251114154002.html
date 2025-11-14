@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Carga - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗑️</span>
+    <span>Eliminar Carga</span>
+</div>
+
+<div class="content-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+        <h2 style="margin-bottom: 1rem;">¿Estás seguro de que deseas eliminar esta carga?</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            Carga: {{ object.descripcion }}<br>
+            Tipo: {{ object.tipo_carga }}<br>
+            Peso: {{ object.peso_kg }} kg<br>
+            Esta acción no se puede deshacer.
+        </p>
+    </div>
+
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        <div class="action-buttons" style="justify-content: center;">
+            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            <a href="{% url 'carga_detail' object.pk %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

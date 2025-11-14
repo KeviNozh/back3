@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Ruta {{ ruta.id }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗺️</span>
+    <span>Ruta {{ ruta.origen }} - {{ ruta.destino }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">ID</div>
+            <div class="detail-value">{{ ruta.id }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Origen</div>
+            <div class="detail-value">{{ ruta.origen }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Destino</div>
+            <div class="detail-value">{{ ruta.destino }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Tipo de Transporte</div>
+            <div class="detail-value">
+                <span class="badge {% if ruta.tipo_transporte == 'TERRESTRE' %}info{% else %}warning{% endif %}">
+                    {{ ruta.get_tipo_transporte_display }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Distancia</div>
+            <div class="detail-value">{{ ruta.distancia_km }} km</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Asociados</div>
+            <div class="detail-value">{{ ruta.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'ruta_edit' ruta.pk %}" class="btn">Editar</a>
+        <a href="{% url 'ruta_delete' ruta.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'rutas' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

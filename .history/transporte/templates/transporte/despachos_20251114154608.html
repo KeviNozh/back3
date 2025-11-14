@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Despachos - Sistema de Gestión de Transporte</title>
+    <style>
+        /* TODOS LOS ESTILOS ORIGINALES DEL DASHBOARD */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* RESTA DE ESTILOS ESPECÍFICOS DE DESPACHOS... */
+        
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .badge.alert {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .filter-select, .search-input {
+                min-width: 100%;
+            }
+            .table-container {
+                overflow-x: auto;
+            }
+            .table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🚚</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                <div>
+                    <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        {% if user.is_staff %}Administrador{% else %}Usuario{% endif %}
+                    </div>
+                </div>
+                <div class="avatar" onclick="window.location.href='{% url 'logout' %}'">AU</div>
+            </div>
+        </div>
+
+        <!-- NAVEGACIÓN CORREGIDA -->
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            <!-- <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div> -->
+        </div>
+
+        <div class="page-title">
+            <span>📦</span>
+            <span>Gestión de Despachos</span>
+        </div>
+
+        <!-- CONTENIDO ESPECÍFICO DE DESPACHOS -->
+        <form method="GET" class="filters">
+            <div class="filter-group">
+                <select class="filter-select" name="estado">
+                    <option value="">Todos los estados</option>
+                    <option value="PENDIENTE" {% if estado_filter == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                    <option value="EN_RUTA" {% if estado_filter == 'EN_RUTA' %}selected{% endif %}>En ruta</option>
+                    <option value="ENTREGADO" {% if estado_filter == 'ENTREGADO' %}selected{% endif %}>Entregado</option>
+                    <option value="CANCELADO" {% if estado_filter == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+                </select>
+                <select class="filter-select" name="tipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="terrestre" {% if tipo_filter == 'terrestre' %}selected{% endif %}>Terrestre</option>
+                    <option value="aereo" {% if tipo_filter == 'aereo' %}selected{% endif %}>Aéreo</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" name="search" placeholder="Buscar despacho..." value="{{ search_query }}">
+            <button type="submit" class="btn">🔍 Filtrar</button>
+            <button type="button" class="btn" onclick="window.location.href='{% url 'despacho_crear' %}'">➕ Nuevo Despacho</button>
+        </form>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Despachos</div>
+                <div style="color: var(--text-secondary); font-size: 0.9rem;">Total: {{ total_despachos }} despachos</div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID Despacho</th>
+                        <th>Cliente</th>
+                        <th>Origen - Destino</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Costo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for despacho in despachos %}
+                    <tr>
+                        <td>D-{{ despacho.id|stringformat:"04d" }}</td>
+                        <td>{{ despacho.cliente.razon_social }}</td>
+                        <td>{{ despacho.ruta.origen }} - {{ despacho.ruta.destino }}</td>
+                        <td>
+                            {% if despacho.vehiculo %}
+                                Terrestre
+                            {% elif despacho.aeronave %}
+                                Aéreo
+                            {% else %}
+                                Sin asignar
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if despacho.estado == 'ENTREGADO' %}active
+                                {% elif despacho.estado == 'PENDIENTE' %}pending
+                                {% elif despacho.estado == 'EN_RUTA' %}info
+                                {% else %}alert{% endif %}">
+                                {{ despacho.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>{{ despacho.fecha_despacho|date:"d/m/Y" }}</td>
+                        <td>${{ despacho.costo_envio }}</td>
+                        <td>
+                            <a href="{% url 'despacho_detail' despacho.pk %}" class="action-btn">Ver</a>
+                            <a href="{% url 'despacho_editar' despacho.pk %}" class="action-btn">Editar</a>
+                            <a href="{% url 'despacho_eliminar' despacho.pk %}" class="action-btn delete">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-secondary);">
+                            No se encontraron despachos
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Funciones JavaScript específicas de despachos
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = `✓ ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #6366f1, #06b6d4);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Auto-submit del formulario cuando cambian los selects
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                this.form.submit();
+            });
+        });
+
+        console.log('📦 Módulo de Despachos cargado exitosamente');
+    </script>
+</body>
+</html>
+==========

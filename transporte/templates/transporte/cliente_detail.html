@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Cliente {{ cliente.razon_social }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👥</span>
+    <span>Cliente {{ cliente.razon_social }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">ID</div>
+            <div class="detail-value">{{ cliente.id }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Razón Social</div>
+            <div class="detail-value">{{ cliente.razon_social }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">RUT</div>
+            <div class="detail-value">{{ cliente.rut }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Persona de Contacto</div>
+            <div class="detail-value">{{ cliente.persona_contacto }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Teléfono</div>
+            <div class="detail-value">{{ cliente.telefono }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Email</div>
+            <div class="detail-value">{{ cliente.email }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Dirección</div>
+            <div class="detail-value">{{ cliente.direccion }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                <span class="badge {% if cliente.activo %}active{% else %}alert{% endif %}">
+                    {% if cliente.activo %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Cargas Registradas</div>
+            <div class="detail-value">{{ cliente.carga_set.count }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Realizados</div>
+            <div class="detail-value">{{ cliente.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'cliente_edit' cliente.pk %}" class="btn">Editar</a>
+        <a href="{% url 'cliente_delete' cliente.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'clientes' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

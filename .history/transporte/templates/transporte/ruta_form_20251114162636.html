@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Ruta - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗺️</span>
+    <span>{% if form.instance.pk %}Editar Ruta{% else %}Nueva Ruta{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_origen">Origen</label>
+                {{ form.origen }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_destino">Destino</label>
+                {{ form.destino }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_tipo_transporte">Tipo de Transporte</label>
+                {{ form.tipo_transporte }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_distancia_km">Distancia (km)</label>
+                {{ form.distancia_km }}
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Ruta
+            </button>
+            <a href="{% url 'rutas' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+/div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Aseguradora</div>
+            <div class="detail-value">{{ seguro.aseguradora }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Cobertura</div>
+            <div class="detail-value">${{ seguro.cobertura }}</div>
+        </div>
+        
+        <div class="detail-item">
+          {% extends 'base.html' %}
+
+{% block title %}Seguro {{ seguro.numero_poliza }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🛡️</span>
+    <span>Seguro {{ seguro.numero_poliza }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">Número de Póliza</div>
+            <div class="detail-value">{{ seguro.numero_poliza }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Tipo de Seguro</div>
+            <div class="detail-value">{{ seguro.tipo_seguro }}</div>
+        <  <div class="detail-label">Vigencia Desde</div>
+            <div class="detail-value">{{ seguro.vigencia_desde|date:"d/m/Y" }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Vigencia Hasta</div>
+            <div class="detail-value">{{ seguro.vigencia_hasta|date:"d/m/Y" }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                <span class="badge 
+                    {% if seguro.estado == 'Vigente' %}active
+                    {% elif seguro.estado == 'Por Vencer' %}warning
+                    {% else %}alert{% endif %}">
+                    {{ seguro.estado }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Vehículo Asegurado</div>
+            <div class="detail-value">
+                {% if seguro.vehiculo %}
+                    {{ seguro.vehiculo.patente }} - {{ seguro.vehiculo.modelo }}
+                {% else %}
+                    <span style="color: var(--text-secondary);">No aplica</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Aeronave Asegurada</div>
+            <div class="detail-value">
+                {% if seguro.aeronave %}
+                    {{ seguro.aeronave.matricula }} - {{ seguro.aeronave.modelo }}
+                {% else %}
+                    <span style="color: var(--text-secondary);">No aplica</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'seguro_edit' seguro.pk %}" class="btn">Editar</a>
+        <a href="{% url 'seguro_delete' seguro.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'seguros' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Aeronave - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>✈️</span>
+    <span>{% if form.instance.pk %}Editar Aeronave{% else %}Nueva Aeronave{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_matricula">Matrícula</label>
+                {{ form.matricula }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_tipo_aeronave">Tipo de Aeronave</label>
+                {{ form.tipo_aeronave }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_modelo">Modelo</label>
+                {{ form.modelo }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_capacidad_kg">Capacidad (kg)</label>
+                {{ form.capacidad_kg }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="id_piloto_asignado">Piloto Asignado</label>
+            {{ form.piloto_asignado }}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="id_activo">
+                {{ form.activo }} Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Aeronave
+            </button>
+            <a href="{% url 'aeronaves' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

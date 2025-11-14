@@ -1,0 +1,76 @@
+<!-- conductor_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}Conductor {{ conductor.nombre }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👨‍💼</span>
+    <span>Conductor {{ conductor.nombre }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">ID</div>
+            <div class="detail-value">{{ conductor.id }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Nombre</div>
+            <div class="detail-value">{{ conductor.nombre }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">RUT</div>
+            <div class="detail-value">{{ conductor.rut }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Licencia</div>
+            <div class="detail-value">{{ conductor.licencia }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Teléfono</div>
+            <div class="detail-value">{{ conductor.telefono }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Email</div>
+            <div class="detail-value">{{ conductor.email }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                <span class="badge {% if conductor.activo %}active{% else %}alert{% endif %}">
+                    {% if conductor.activo %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Vehículo Asignado</div>
+            <div class="detail-value">
+                {% if conductor.vehiculo_set.exists %}
+                    {{ conductor.vehiculo_set.first.patente }}
+                {% else %}
+                    <span style="color: var(--text-secondary);">Sin asignar</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Asignados</div>
+            <div class="detail-value">{{ conductor.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'conductor_edit' conductor.pk %}" class="btn">Editar</a>
+        <a href="{% url 'conductor_delete' conductor.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'conductores' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

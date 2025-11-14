@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Conductor - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👨‍💼</span>
+    <span>{% if form.instance.pk %}Editar Conductor{% else %}Nuevo Conductor{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_nombre">Nombre</label>
+                {{ form.nombre }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_rut">RUT</label>
+                {{ form.rut }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_licencia">Licencia</label>
+                {{ form.licencia }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_telefono">Teléfono</label>
+                {{ form.telefono }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_email">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_activo">
+                    {{ form.activo }} Activo
+                </label>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Conductor
+            </button>
+            <a href="{% url 'conductores' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

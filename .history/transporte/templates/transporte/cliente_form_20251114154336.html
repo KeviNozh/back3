@@ -1,0 +1,63 @@
+<!-- cliente_form.html -->
+lass="form-label" for="id_activo">
+                {{ form.activo }} Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Cliente
+            </button>
+            <a href="{% url 'clientes' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Cliente - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👥</span>
+    <span>{% if form.instance.pk %}Editar Cliente{% else %}Nuevo Cliente{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label" for="id_razon_social">Razón Social</label>
+            {{ form.razon_social }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_rut">RUT</label>
+                {{ form.rut }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_persona_contacto">Persona de Contacto</label>
+                {{ form.persona_contacto }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_telefono">Teléfono</label>
+                {{ form.telefono }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_email">Email</label>
+                {{ form.email }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="id_direccion">Dirección</label>
+            {{ form.direccion }}
+        </div>
+
+        <div class="form-group">
+            <label c

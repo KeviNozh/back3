@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if despacho %}Editar{% else %}Crear{% endif %} Despacho - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📦</span>
+    <span>{% if despacho %}Editar Despacho{% else %}Nuevo Despacho{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Cliente</label>
+                <select name="cliente" class="form-select" required>
+                    <option value="">Seleccionar cliente</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}" {% if despacho and despacho.cliente.id == cliente.id %}selected{% endif %}>
+                        {{ cliente.razon_social }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ruta</label>
+                <select name="ruta" class="form-select" required>
+                    <option value="">Seleccionar ruta</option>
+                    {% for ruta in rutas %}
+                    <option value="{{ ruta.id }}" {% if despacho and despacho.ruta.id == ruta.id %}selected{% endif %}>
+                        {{ ruta.origen }} - {{ ruta.destino }} ({{ ruta.tipo_transporte }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Carga</label>
+                <select name="carga" class="form-select" required>
+                    <option value="">Seleccionar carga</option>
+                    {% for carga in cargas %}
+                    <option value="{{ carga.id }}" {% if despacho and despacho.carga.id == carga.id %}selected{% endif %}>
+                        {{ carga.descripcion }} - {{ carga.cliente.razon_social }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Costo de Envío</label>
+                <input type="number" name="costo_envio" class="form-input" step="0.01" 
+                       value="{% if despacho %}{{ despacho.costo_envio }}{% else %}0{% endif %}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Vehículo</label>
+                <select name="vehiculo" class="form-select">
+                    <option value="">Sin vehículo</option>
+                    {% for vehiculo in vehiculos %}
+                    <option value="{{ vehiculo.id }}" {% if despacho and despacho.vehiculo and despacho.vehiculo.id == vehiculo.id %}selected{% endif %}>
+                        {{ vehiculo.patente }} - {{ vehiculo.modelo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Aeronave</label>
+                <select name="aeronave" class="form-select">
+                    <option value="">Sin aeronave</option>
+                    {% for aeronave in aeronaves %}
+                    <option value="{{ aeronave.id }}" {% if despacho and despacho.aeronave and despacho.aeronave.id == aeronave.id %}selected{% endif %}>
+                        {{ aeronave.matricula }} - {{ aeronave.modelo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Conductor</label>
+                <select name="conductor" class="form-select">
+                    <option value="">Sin conductor</option>
+                    {% for conductor in conductores %}
+                    <option value="{{ conductor.id }}" {% if despacho and despacho.conductor and despacho.conductor.id == conductor.id %}selected{% endif %}>
+                        {{ conductor.nombre }} - {{ conductor.licencia }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Piloto</label>
+                <select name="piloto" class="form-select">
+                    <option value="">Sin piloto</option>
+                    {% for piloto in pilotos %}
+                    <option value="{{ piloto.id }}" {% if despacho and despacho.piloto and despacho.piloto.id == piloto.id %}selected{% endif %}>
+                        {{ piloto.nombre }} - {{ piloto.certificacion }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-select" required>
+                <option value="PENDIENTE" {% if despacho and despacho.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                <option value="EN_RUTA" {% if despacho and despacho.estado == 'EN_RUTA' %}selected{% endif %}>En Ruta</option>
+                <option value="ENTREGADO" {% if despacho and despacho.estado == 'ENTREGADO' %}selected{% endif %}>Entregado</option>
+                <option value="CANCELADO" {% if despacho and despacho.estado == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if despacho %}Actualizar{% else %}Crear{% endif %} Despacho
+            </button>
+            <a href="{% url 'despachos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

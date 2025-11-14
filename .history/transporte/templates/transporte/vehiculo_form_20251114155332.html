@@ -1,0 +1,63 @@
+
+     <label class="form-label" for="id_modelo">Modelo</label>
+                {{ form.modelo }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_capacidad_kg">Capacidad (kg)</label>
+                {{ form.capacidad_kg }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_año">Año</label>
+                {{ form.año }}
+           {% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Vehículo - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🚛</span>
+    <span>{% if form.instance.pk %}Editar Vehículo{% else %}Nuevo Vehículo{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="id_patente">Patente</label>
+                {{ form.patente }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_tipo_vehiculo">Tipo de Vehículo</label>
+                {{ form.tipo_vehiculo }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_conductor_asignado">Conductor Asignado</label>
+                {{ form.conductor_asignado }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="id_activo">
+                {{ form.activo }} Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Vehículo
+            </button>
+            <a href="{% url 'vehiculos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

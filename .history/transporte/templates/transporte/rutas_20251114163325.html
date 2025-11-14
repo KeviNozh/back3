@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutas - Sistema de Gestión de Transporte</title>
+    <style>
+        /* TODOS LOS ESTILOS ORIGINALES DEL DASHBOARD - IGUAL QUE EN DESPACHOS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.terrestre {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.aereo {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .filter-select, .search-input {
+                min-width: 100%;
+            }
+            .table-container {
+                overflow-x: auto;
+            }
+            .table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🚚</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                <div>
+                    <div style="font-weight: 600;">Admin Usuario</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Administrador del Sistema</div>
+                </div>
+                <div class="avatar">AU</div>
+            </div>
+        </div>
+
+        <!-- NAVEGACIÓN CORREGIDA -->
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <div class="page-title">
+            <span>🗺️</span>
+            <span>Gestión de Rutas</span>
+        </div>
+
+        <!-- CONTENIDO ESPECÍFICO DE RUTAS -->
+        <div class="filters">
+            <div class="filter-group">
+                <select class="filter-select" id="filter-type">
+                    <option value="">Todos los tipos</option>
+                    <option value="terrestre">Terrestre</option>
+                    <option value="aereo">Aéreo</option>
+                </select>
+                <select class="filter-select" id="filter-status">
+                    <option value="">Todos los estados</option>
+                    <option value="active">Activa</option>
+                    <option value="inactive">Inactiva</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar ruta...">
+            <button class="btn" id="new-route-btn">➕ Nueva Ruta</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Rutas</div>
+                <div id="route-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID Ruta</th>
+                        <th>Origen - Destino</th>
+                        <th>Tipo</th>
+                        <th>Distancia</th>
+                        <th>Tiempo Estimado</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="routes-table-body">
+                    <tr>
+                        <td colspan="7" class="loading">Cargando datos de rutas desde la base de datos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Variable global para almacenar las rutas
+        let routesData = [];
+
+        // Función para cargar rutas desde la base de datos
+        async function loadRoutesFromDatabase() {
+            try {
+                showLoadingState();
+                
+                // Aquí se haría la llamada real a tu API o backend
+                const response = await fetch('/api/rutas/');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar las rutas');
+                }
+                
+                routesData = await response.json();
+                renderRoutesTable(routesData);
+                showNotification('Datos de rutas cargados correctamente');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorState('Error al cargar las rutas: ' + error.message);
+            }
+        }
+
+        // Función para mostrar estado de carga
+        function showLoadingState() {
+            const tableBody = document.getElementById('routes-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading">Cargando datos de rutas desde la base de datos...</td>
+                </tr>
+            `;
+            document.getElementById('route-count').textContent = 'Cargando...';
+        }
+
+        // Función para mostrar estado de error
+        function showErrorState(message) {
+            const tableBody = document.getElementById('routes-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="error">
+                            ${message}
+                            <br>
+                            <button class="btn" onclick="loadRoutesFromDatabase()" style="margin-top: 1rem;">
+                                Reintentar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('route-count').textContent = 'Error';
+        }
+
+        // Función para renderizar la tabla de rutas
+        function renderRoutesTable(routes) {
+            const tableBody = document.getElementById('routes-table-body');
+            const routeCount = document.getElementById('route-count');
+            
+            if (routes.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="loading">No se encontraron rutas en la base de datos</td>
+                    </tr>
+                `;
+                routeCount.textContent = 'Total: 0 rutas';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            routeCount.textContent = `Total: ${routes.length} rutas`;
+            
+            routes.forEach(route => {
+                const row = document.createElement('tr');
+                
+                // Determinar la clase del badge según el tipo
+                const typeClass = route.tipo_transporte === 'TERRESTRE' ? 'terrestre' : 'aereo';
+                const statusClass = route.activo ? 'active' : 'inactive';
+                const statusText = route.activo ? 'Activa' : 'Inactiva';
+                
+                // Calcular tiempo estimado basado en distancia (simulación)
+                const tiempoEstimado = calcularTiempoEstimado(route.distancia_km, route.tipo_transporte);
+                
+                row.innerHTML = `
+                    <td>R-${route.id}</td>
+                    <td>${route.origen} - ${route.destino}</td>
+                    <td><span class="badge ${typeClass}">${route.tipo_transporte === 'TERRESTRE' ? 'Terrestre' : 'Aéreo'}</span></td>
+                    <td>${route.distancia_km} km</td>
+                    <td>${tiempoEstimado}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="viewRoute(${route.id})">Ver</button>
+                        <button class="action-btn" onclick="editRoute(${route.id})">Editar</button>
+                        <button class="action-btn delete" onclick="deleteRoute(${route.id})">Eliminar</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para calcular tiempo estimado
+        function calcularTiempoEstimado(distancia, tipo) {
+            if (tipo === 'TERRESTRE') {
+                const horas = Math.ceil(distancia / 80); // 80 km/h promedio
+                return horas <= 1 ? '1 hora' : `${horas} horas`;
+            } else {
+                const horas = Math.ceil(distancia / 800); // 800 km/h promedio
+                return horas <= 1 ? '1 hora' : `${horas} horas`;
+            }
+        }
+
+        // Función para filtrar rutas
+        function filterRoutes() {
+            const typeFilter = document.getElementById('filter-type').value;
+            const statusFilter = document.getElementById('filter-status').value;
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            
+            const filteredRoutes = routesData.filter(route => {
+                const matchesType = !typeFilter || 
+                    (typeFilter === 'terrestre' && route.tipo_transporte === 'TERRESTRE') ||
+                    (typeFilter === 'aereo' && route.tipo_transporte === 'AEREO');
+                
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && route.activo) ||
+                    (statusFilter === 'inactive' && !route.activo);
+                
+                const matchesSearch = !searchText || 
+                    route.origen.toLowerCase().includes(searchText) || 
+                    route.destino.toLowerCase().includes(searchText) ||
+                    route.id.toString().includes(searchText);
+                
+                return matchesType && matchesStatus && matchesSearch;
+            });
+            
+            renderRoutesTable(filteredRoutes);
+        }
+
+        // Funciones de acción para las rutas
+        async function viewRoute(routeId) {
+            try {
+                const response = await fetch(`/api/rutas/${routeId}/`);
+                const routeDetails = await response.json();
+                
+                showNotification(`Viendo detalles de la ruta ${routeId}`);
+                console.log('Detalles de la ruta:', routeDetails);
+                
+            } catch (error) {
+                console.error('Error al obtener detalles:', error);
+                showNotification('Error al cargar detalles de la ruta');
+            }
+        }
+
+        async function editRoute(routeId) {
+            showNotification(`Editando la ruta ${routeId}`);
+            window.location.href = `/rutas/${routeId}/editar/`;
+        }
+
+        async function deleteRoute(routeId) {
+            if (confirm(`¿Está seguro de que desea eliminar la ruta ${routeId}?`)) {
+                try {
+                    const response = await fetch(`/api/rutas/${routeId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        await loadRoutesFromDatabase();
+                        showNotification(`Ruta ${routeId} eliminada correctamente`);
+                    } else {
+                        throw new Error('Error al eliminar la ruta');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar la ruta');
+                }
+            }
+        }
+
+        // Función auxiliar para obtener el token CSRF
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = `✓ ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #6366f1, #06b6d4);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Inicialización cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRoutesFromDatabase();
+            
+            document.getElementById('filter-type').addEventListener('change', filterRoutes);
+            document.getElementById('filter-status').addEventListener('change', filterRoutes);
+            document.getElementById('search-input').addEventListener('input', filterRoutes);
+            
+            document.getElementById('new-route-btn').addEventListener('click', function() {
+                showNotification('Creando nueva ruta');
+                window.location.href = '/rutas/nueva/';
+            });
+            
+            console.log('🗺️ Módulo de Rutas cargado exitosamente');
+        });
+
+        // Estilos para las animaciones de notificaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+============================================================
+
+
+===== ruta_confirm_delete.html =====
+<!--  -->
+
+============================================================
+
+
+===== ruta_detail.html =====
+<!--  -->
+{% extends 'base.html' %}
+
+{% block title %}Ruta {{ ruta.id }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗺️</span>
+    <span>Ruta {{ ruta.origen }} - {{ ruta.destino }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">ID</div>
+            <div class="detail-value">{{ ruta.id }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Origen</div>
+            <div class="detail-value">{{ ruta.origen }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Destino</div>
+            <div class="detail-value">{{ ruta.destino }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Tipo de Transporte</div>
+            <div class="detail-value">
+                <span class="badge {% if ruta.tipo_transporte == 'TERRESTRE' %}info{% else %}warning{% endif %}">
+                    {{ ruta.get_tipo_transporte_display }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Distancia</div>
+            <div class="detail-value">{{ ruta.distancia_km }} km</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Asociados</div>
+            <div class="detail-value">{{ ruta.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'ruta_edit' ruta.pk %}" class="btn">Editar</a>
+        <a href="{% url 'ruta_delete' ruta.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'rutas' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

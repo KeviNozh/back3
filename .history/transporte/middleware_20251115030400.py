@@ -44,7 +44,7 @@ class PermisosMiddleware:
             print(f"Error en middleware de permisos: {e}")
             tipo_usuario = 'CLIENTE'
 
-        # ✅ DEFINIR PERMISOS ACTUALIZADOS - CORREGIR URLs DE ELIMINACIÓN
+        # ✅ DEFINIR PERMISOS ACTUALIZADOS - INCLUIR URLs DE ELIMINACIÓN
         permisos = {
             'ADMIN': [
                 # URLs existentes...
@@ -54,34 +54,29 @@ class PermisosMiddleware:
                 'ruta_create', 'ruta_update', 'ruta_delete', 'ruta_list', 'ruta_detail',
                 'vehiculo_editar', 'aeronave_editar', 'conductor_editar',
                 'piloto_editar', 'cliente_editar', 'carga_editar', 'seguro_editar',
-                'generar_reporte_pdf', 'obtener_datos_reporte',
+                'aeronave_eliminar', 'generar_reporte_pdf', 'obtener_datos_reporte',
                 'gestion_usuarios', 'editar_usuario', 'asignar_conductor_piloto',
-                'vehiculo_crear', 'aeronave_crear', 'conductor_crear',
-                'piloto_crear', 'cliente_crear', 'carga_crear', 'seguro_crear',
+                'vehiculo_crear', 'vehiculo_eliminar', 'aeronave_crear',
+                'conductor_crear', 'conductor_eliminar', 'piloto_crear',
+                'piloto_eliminar', 'cliente_crear', 'cliente_eliminar',
+                'carga_crear', 'carga_eliminar', 'seguro_crear', 'seguro_eliminar',
                 
-                # ✅ CORREGIR URLs DE ELIMINACIÓN (USAR LOS NOMBRES EXACTOS DE urls.py)
-                'vehiculo_eliminar', 'aeronave_eliminar', 'conductor_eliminar',
-                'piloto_eliminar', 'cliente_eliminar', 'carga_eliminar', 'seguro_eliminar',
-                'ruta_delete', 'despacho_eliminar'
+                # ✅ AGREGAR URLs ESPECÍFICAS DE ELIMINACIÓN
+                'eliminar_aeronave', 'eliminar_vehiculo', 'eliminar_conductor',
+                'eliminar_piloto', 'eliminar_cliente', 'eliminar_carga', 'eliminar_seguro'
             ],
             'CLIENTE': [
                 'despachos', 'rutas', 'vehiculos', 'aeronaves', 'conductores', 
                 'pilotos', 'clientes', 'cargas', 'seguros', 'api',
-                'ruta_list', 'ruta_detail', 'despacho_detail',
-                'vehiculo_detail', 'aeronave_detail', 'conductor_detail',
-                'piloto_detail', 'cliente_detail', 'carga_detail', 'seguro_detail'
+                'ruta_list', 'ruta_detail', 'despacho_detail'
             ],
             'CONDUCTOR': [
                 'despachos', 'vehiculos', 'rutas', 'cargas', 'ruta_list', 'ruta_detail',
-                'despacho_detail', 'conductores', 'clientes', 'api',
-                'vehiculo_detail', 'aeronave_detail', 'conductor_detail',
-                'piloto_detail', 'cliente_detail', 'carga_detail', 'seguro_detail'
+                'despacho_detail', 'conductores', 'clientes', 'api'
             ],
             'PILOTO': [
                 'despachos', 'aeronaves', 'rutas', 'cargas', 'ruta_list', 'ruta_detail',
-                'despacho_detail', 'pilotos', 'clientes', 'api',
-                'vehiculo_detail', 'aeronave_detail', 'conductor_detail',
-                'piloto_detail', 'cliente_detail', 'carga_detail', 'seguro_detail'
+                'despacho_detail', 'pilotos', 'clientes', 'api'
             ]
         }
 

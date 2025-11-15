@@ -1,3 +1,4 @@
+<!-- conductor_detail.html -->
 {% extends 'base.html' %}
 
 {% block title %}Conductor {{ conductor.nombre }} - Logística Global{% endblock %}
@@ -67,9 +68,8 @@
     </div>
 
     <div class="action-buttons">
-        <!-- ✅ CORREGIDO: usar 'conductor_editar' en lugar de 'conductor_edit' -->
-        <a href="{% url 'conductor_editar' conductor.pk %}" class="btn">Editar</a>
-        <a href="{% url 'conductor_eliminar' conductor.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'conductor_edit' conductor.pk %}" class="btn">Editar</a>
+        <a href="{% url 'conductor_delete' conductor.pk %}" class="btn btn-danger">Eliminar</a>
         <a href="{% url 'conductores' %}" class="btn btn-secondary">Volver a la lista</a>
     </div>
 </div>

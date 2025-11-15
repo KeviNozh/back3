@@ -755,19 +755,17 @@ function addInactivityTimer() {
 
 // Para habilitar el contador visual, descomenta la siguiente línea:
 // document.addEventListener('DOMContentLoaded', addInactivityTimer);
-    // ===== AUTO-REFRESH CADA 3 SEGUNDOS - SIN INTERFERIR CON BOTONES =====
+    
+// ===== AUTO-REFRESH CADA 3 SEGUNDOS =====
 let autoRefreshInterval;
-let isUserInteracting = false;
-let interactionTimeout;
 
 function startAutoRefresh() {
+    // Detener cualquier intervalo existente
     stopAutoRefresh();
     
+    // Configurar nuevo intervalo de 3 segundos (3000 ms)
     autoRefreshInterval = setInterval(() => {
-        // No refrescar si el usuario está interactuando
-        if (!isUserInteracting) {
-            refreshPageData();
-        }
+        refreshPageData();
     }, 3000);
 }
 
@@ -778,90 +776,51 @@ function stopAutoRefresh() {
     }
 }
 
-function setUserInteracting() {
-    isUserInteracting = true;
-    
-    // Limpiar timeout anterior
-    if (interactionTimeout) {
-        clearTimeout(interactionTimeout);
-    }
-    
-    // El usuario deja de interactuar después de 10 segundos
-    interactionTimeout = setTimeout(() => {
-        isUserInteracting = false;
-    }, 10000);
-}
-
 function refreshPageData() {
+    // Obtener la URL actual
     const currentUrl = window.location.href;
     const urlPath = window.location.pathname;
     
-    // Páginas donde NO hacer auto-refresh
+    // Solo hacer refresh en páginas específicas (evitar en formularios, etc.)
     const excludedPages = [
-        '/login/', '/register/', '/logout/', '/admin/',
-        '/crear/', '/editar/', '/eliminar/', '/form/',
-        '/gestion_usuarios/', '/asignar/'
+        '/login/',
+        '/register/',
+        '/logout/',
+        '/admin/',
+        '/crear/',
+        '/editar/',
+        '/eliminar/',
+        '/form/'
     ];
     
     // Verificar si estamos en una página excluida
     const isExcluded = excludedPages.some(page => urlPath.includes(page));
     
     if (isExcluded) {
-        return;
+        return; // No hacer auto-refresh en páginas excluidas
     }
     
     // Diferentes estrategias según el tipo de página
     if (urlPath === '/' || urlPath === '/dashboard/') {
         refreshDashboard();
-    } else if (urlPath.includes('/despachos') && !urlPath.includes('/eliminar')) {
+    } else if (urlPath.includes('/despachos')) {
         refreshDespachos();
-    } else if (urlPath.includes('/vehiculos') && !urlPath.includes('/eliminar')) {
+    } else if (urlPath.includes('/vehiculos')) {
         refreshVehiculos();
-    } else if (urlPath.includes('/aeronaves') && !urlPath.includes('/eliminar')) {
+    } else if (urlPath.includes('/aeronaves')) {
         refreshAeronaves();
-    } else if (urlPath.includes('/rutas') && !urlPath.includes('/eliminar')) {
+    } else if (urlPath.includes('/rutas')) {
         refreshRutas();
-    } else if (urlPath.includes('/conductores') && !urlPath.includes('/eliminar')) {
-        refreshConductores();
-    } else if (urlPath.includes('/pilotos') && !urlPath.includes('/eliminar')) {
-        refreshPilotos();
-    } else if (urlPath.includes('/clientes') && !urlPath.includes('/eliminar')) {
-        refreshClientes();
-    } else if (urlPath.includes('/cargas') && !urlPath.includes('/eliminar')) {
-        refreshCargas();
-    } else if (urlPath.includes('/seguros') && !urlPath.includes('/eliminar')) {
-        refreshSeguros();
     } else {
+        // Refresh genérico para otras páginas
         genericRefresh();
     }
 }
 
-// ===== DETECTAR INTERACCIÓN DEL USUARIO =====
-function setupInteractionDetection() {
-    // Eventos que indican que el usuario está interactuando
-    const interactionEvents = [
-        'click', 'mousedown', 'keydown', 'scroll', 'touchstart'
-    ];
-    
-    interactionEvents.forEach(eventType => {
-        document.addEventListener(eventType, function(e) {
-            // Si el usuario hace click en un botón de eliminar, editar o crear
-            if (e.target.closest('.action-btn') || 
-                e.target.closest('.btn-danger') || 
-                e.target.closest('[onclick*="eliminar"]') ||
-                e.target.closest('[onclick*="editar"]') ||
-                e.target.closest('[onclick*="crear"]')) {
-                setUserInteracting();
-            }
-        }, true);
-    });
-    
-    // También detectar cuando el mouse se mueve
-    document.addEventListener('mousemove', setUserInteracting);
-}
+// ===== ESTRATEGIAS ESPECÍFICAS POR PÁGINA =====
 
-// ===== ESTRATEGIAS DE ACTUALIZACIÓN (MANTENER LAS EXISTENTES) =====
 function refreshDashboard() {
+    // Usar la API para obtener datos actualizados del dashboard
     fetch('/api/v1/despachos/')
         .then(response => response.json())
         .then(data => {
@@ -873,6 +832,7 @@ function refreshDashboard() {
 }
 
 function refreshDespachos() {
+    // Actualizar solo la tabla de despachos via API
     fetch('/api/v1/despachos/')
         .then(response => response.json())
         .then(despachos => {
@@ -916,62 +876,8 @@ function refreshRutas() {
         });
 }
 
-function refreshConductores() {
-    fetch('/api/v1/conductores/')
-        .then(response => response.json())
-        .then(conductores => {
-            updateConductoresTable(conductores);
-        })
-        .catch(error => {
-            console.log('Error en auto-refresh conductores:', error);
-        });
-}
-
-function refreshPilotos() {
-    fetch('/api/v1/pilotos/')
-        .then(response => response.json())
-        .then(pilotos => {
-            updatePilotosTable(pilotos);
-        })
-        .catch(error => {
-            console.log('Error en auto-refresh pilotos:', error);
-        });
-}
-
-function refreshClientes() {
-    fetch('/api/v1/clientes/')
-        .then(response => response.json())
-        .then(clientes => {
-            updateClientesTable(clientes);
-        })
-        .catch(error => {
-            console.log('Error en auto-refresh clientes:', error);
-        });
-}
-
-function refreshCargas() {
-    fetch('/api/v1/cargas/')
-        .then(response => response.json())
-        .then(cargas => {
-            updateCargasTable(cargas);
-        })
-        .catch(error => {
-            console.log('Error en auto-refresh cargas:', error);
-        });
-}
-
-function refreshSeguros() {
-    fetch('/api/v1/seguros/')
-        .then(response => response.json())
-        .then(seguros => {
-            updateSegurosTable(seguros);
-        })
-        .catch(error => {
-            console.log('Error en auto-refresh seguros:', error);
-        });
-}
-
 function genericRefresh() {
+    // Para páginas sin API específica, hacer un refresh suave
     const mainContent = document.querySelector('.content-card, .table-container, .stats-grid');
     if (mainContent) {
         mainContent.style.opacity = '0.9';
@@ -981,8 +887,10 @@ function genericRefresh() {
     }
 }
 
-// ===== FUNCIONES DE ACTUALIZACIÓN (MANTENER LAS EXISTENTES) =====
+// ===== FUNCIONES DE ACTUALIZACIÓN =====
+
 function updateDashboardStats(despachosData) {
+    // Actualizar contadores del dashboard
     const totalDespachos = document.querySelector('[data-stat="total-despachos"]');
     const despachosPendientes = document.querySelector('[data-stat="despachos-pendientes"]');
     const despachosEnRuta = document.querySelector('[data-stat="despachos-en-ruta"]');
@@ -991,6 +899,7 @@ function updateDashboardStats(despachosData) {
         totalDespachos.textContent = despachosData.length || 0;
     }
     
+    // Calcular estadísticas
     if (despachosPendientes && despachosEnRuta) {
         const pendientes = despachosData.filter(d => d.estado === 'PENDIENTE').length;
         const enRuta = despachosData.filter(d => d.estado === 'EN_RUTA').length;
@@ -998,18 +907,26 @@ function updateDashboardStats(despachosData) {
         despachosPendientes.textContent = pendientes;
         despachosEnRuta.textContent = enRuta;
     }
+    
+    // Actualizar lista de últimos despachos
+    updateUltimosDespachos(despachosData.slice(0, 5));
 }
 
 function updateDespachosTable(despachos) {
     const tableBody = document.getElementById('despachos-table-body');
     if (!tableBody) return;
+    
+    // Aquí iría la lógica para actualizar la tabla de despachos
     console.log('Actualizando tabla de despachos:', despachos.length, 'registros');
+    
+    // Efecto visual de actualización
     highlightUpdatedRow(tableBody);
 }
 
 function updateVehiculosTable(vehiculos) {
     const tableBody = document.getElementById('vehiculos-table-body');
     if (!tableBody) return;
+    
     console.log('Actualizando tabla de vehículos:', vehiculos.length, 'registros');
     highlightUpdatedRow(tableBody);
 }
@@ -1017,6 +934,7 @@ function updateVehiculosTable(vehiculos) {
 function updateAeronavesTable(aeronaves) {
     const tableBody = document.getElementById('aircraft-table-body');
     if (!tableBody) return;
+    
     console.log('Actualizando tabla de aeronaves:', aeronaves.length, 'registros');
     highlightUpdatedRow(tableBody);
 }
@@ -1024,46 +942,22 @@ function updateAeronavesTable(aeronaves) {
 function updateRutasTable(rutas) {
     const tableBody = document.getElementById('rutas-table-body');
     if (!tableBody) return;
+    
     console.log('Actualizando tabla de rutas:', rutas.length, 'registros');
     highlightUpdatedRow(tableBody);
 }
 
-function updateConductoresTable(conductores) {
-    const tableBody = document.getElementById('conductores-table-body');
-    if (!tableBody) return;
-    console.log('Actualizando tabla de conductores:', conductores.length, 'registros');
-    highlightUpdatedRow(tableBody);
-}
-
-function updatePilotosTable(pilotos) {
-    const tableBody = document.getElementById('pilotos-table-body');
-    if (!tableBody) return;
-    console.log('Actualizando tabla de pilotos:', pilotos.length, 'registros');
-    highlightUpdatedRow(tableBody);
-}
-
-function updateClientesTable(clientes) {
-    const tableBody = document.getElementById('clientes-table-body');
-    if (!tableBody) return;
-    console.log('Actualizando tabla de clientes:', clientes.length, 'registros');
-    highlightUpdatedRow(tableBody);
-}
-
-function updateCargasTable(cargas) {
-    const tableBody = document.getElementById('cargas-table-body');
-    if (!tableBody) return;
-    console.log('Actualizando tabla de cargas:', cargas.length, 'registros');
-    highlightUpdatedRow(tableBody);
-}
-
-function updateSegurosTable(seguros) {
-    const tableBody = document.getElementById('seguros-table-body');
-    if (!tableBody) return;
-    console.log('Actualizando tabla de seguros:', seguros.length, 'registros');
-    highlightUpdatedRow(tableBody);
+function updateUltimosDespachos(despachos) {
+    // Actualizar la sección de últimos despachos en el dashboard
+    const ultimosDespachosContainer = document.getElementById('ultimos-despachos');
+    if (!ultimosDespachosContainer) return;
+    
+    // Aquí iría la lógica para renderizar los últimos despachos
+    console.log('Actualizando últimos despachos:', despachos.length);
 }
 
 function highlightUpdatedRow(tableBody) {
+    // Efecto visual para indicar actualización
     const rows = tableBody.querySelectorAll('tr');
     if (rows.length > 0) {
         rows[0].style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
@@ -1074,6 +968,7 @@ function highlightUpdatedRow(tableBody) {
 }
 
 // ===== CONTROL DEL AUTO-REFRESH =====
+
 function toggleAutoRefresh() {
     const autoRefreshBtn = document.getElementById('auto-refresh-btn');
     
@@ -1094,26 +989,25 @@ function toggleAutoRefresh() {
     }
 }
 
-// ===== INICIALIZACIÓN MEJORADA =====
+// ===== INICIALIZACIÓN =====
+
 document.addEventListener('DOMContentLoaded', function() {
     // Solo activar auto-refresh para usuarios autenticados
     {% if user.is_authenticated %}
     
-    // Configurar detección de interacción PRIMERO
-    setupInteractionDetection();
-    
     // Crear botón de control de auto-refresh
     createAutoRefreshButton();
     
-    // Iniciar auto-refresh por defecto después de un delay
+    // Iniciar auto-refresh por defecto
     setTimeout(() => {
         startAutoRefresh();
-    }, 5000);
+    }, 5000); // Esperar 5 segundos después de cargar la página
     
     {% endif %}
 });
 
 function createAutoRefreshButton() {
+    // Crear botón de control en el header
     const header = document.querySelector('.header');
     if (!header) return;
     
@@ -1135,6 +1029,7 @@ function createAutoRefreshButton() {
     autoRefreshBtn.onclick = toggleAutoRefresh;
     autoRefreshBtn.title = 'Click para desactivar auto-refresh cada 3 segundos';
     
+    // Agregar hover effects
     autoRefreshBtn.addEventListener('mouseenter', function() {
         this.style.background = 'var(--bg-hover)';
         this.style.transform = 'translateY(-1px)';
@@ -1145,6 +1040,7 @@ function createAutoRefreshButton() {
         this.style.transform = 'translateY(0)';
     });
     
+    // Insertar en el header (junto al user-info)
     const userInfo = document.querySelector('.user-info');
     if (userInfo) {
         userInfo.parentNode.insertBefore(autoRefreshBtn, userInfo);
@@ -1158,6 +1054,7 @@ document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
         stopAutoRefresh();
     } else {
+        // Reactivar después de 1 segundo cuando la pestaña vuelve a estar activa
         setTimeout(() => {
             {% if user.is_authenticated %}
             startAutoRefresh();
@@ -1166,7 +1063,25 @@ document.addEventListener('visibilitychange', function() {
     }
 });
 
-console.log('🔄 Sistema de Auto-Refresh MEJORADO cargado');
+// Pausar auto-refresh cuando el usuario está escribiendo en formularios
+document.addEventListener('focus', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        stopAutoRefresh();
+    }
+}, true);
+
+document.addEventListener('blur', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        // Reactivar después de que el usuario termina de escribir
+        setTimeout(() => {
+            {% if user.is_authenticated %}
+            startAutoRefresh();
+            {% endif %}
+        }, 5000);
+    }
+}, true);
+
+console.log('🔄 Sistema de Auto-Refresh cargado - Actualizando cada 3 segundos');
 
         // ===== FUNCIONES DE NAVEGACIÓN =====
         function goToDashboard() {

@@ -56,12 +56,12 @@ urlpatterns = [
     path('reportes/', admin_required(views.reportes_view), name='reportes'),
     path('api-docs/', views.api_view, name='api'),
     path('vehiculos/<int:pk>/', solo_lectura(views.vehiculo_detail), name='vehiculo_detail'),
-    path('aeronaves/<int:pk>/', solo_lectura(views.aeronave_detail), name='aeronave_detail'),
-    path('conductores/<int:pk>/', solo_lectura(views.conductor_detail), name='conductor_detail'),
-    path('pilotos/<int:pk>/', solo_lectura(views.piloto_detail), name='piloto_detail'),
-    path('clientes/<int:pk>/', solo_lectura(views.cliente_detail), name='cliente_detail'),
-    path('cargas/<int:pk>/', solo_lectura(views.carga_detail), name='carga_detail'),
-    path('seguros/<int:pk>/', solo_lectura(views.seguro_detail), name='seguro_detail'),
+path('aeronaves/<int:pk>/', solo_lectura(views.aeronave_detail), name='aeronave_detail'),
+path('conductores/<int:pk>/', solo_lectura(views.conductor_detail), name='conductor_detail'),
+path('pilotos/<int:pk>/', solo_lectura(views.piloto_detail), name='piloto_detail'),
+path('clientes/<int:pk>/', solo_lectura(views.cliente_detail), name='cliente_detail'),
+path('cargas/<int:pk>/', solo_lectura(views.carga_detail), name='carga_detail'),
+path('seguros/<int:pk>/', solo_lectura(views.seguro_detail), name='seguro_detail'),
     
     # URLs para CRUD de Rutas (solo admin)
     path('rutas/lista/', solo_lectura(RutaListView.as_view()), name='ruta_list'),

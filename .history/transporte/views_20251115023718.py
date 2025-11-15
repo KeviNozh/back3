@@ -1131,7 +1131,6 @@ def seguro_detail(request, pk):
         'seguro': seguro,
     }
     return render(request, 'transporte/seguro_detail.html', context)
-
 @login_required
 def editar_carga(request, pk):
     """Vista para editar una carga existente"""

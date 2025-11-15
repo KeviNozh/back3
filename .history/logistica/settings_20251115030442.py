@@ -40,7 +40,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'transporte.middleware.PermisosMiddleware', 
+    #'transporte.middleware.PermisosMiddleware', 
 ]
 
 ROOT_URLCONF = 'logistica.urls'

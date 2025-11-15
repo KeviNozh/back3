@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Carga {{ carga.descripcion }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📦</span>
+    <span>Carga {{ carga.descripcion }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">ID</div>
+            <div class="detail-value">{{ carga.id }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Descripción</div>
+            <div class="detail-value">{{ carga.descripcion }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Tipo de Carga</div>
+            <div class="detail-value">{{ carga.tipo_carga }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Peso</div>
+            <div class="detail-value">{{ carga.peso_kg }} kg</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Volumen</div>
+            <div class="detail-value">{{ carga.volumen_m3 }} m³</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Valor Declarado</div>
+            <div class="detail-value">${{ carga.valor_declarado }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Cliente</div>
+            <div class="detail-value">{{ carga.cliente.razon_social }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Notas Especiales</div>
+            <div class="detail-value">
+                {% if carga.notas_especiales %}
+                    {{ carga.notas_especiales }}
+                {% else %}
+                    <span style="color: var(--text-secondary);">Sin notas especiales</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Asociados</div>
+            <div class="detail-value">{{ carga.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'carga_editar' carga.pk %}" class="btn">Editar</a>
+        <a href="{% url 'carga_eliminar' carga.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'cargas' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

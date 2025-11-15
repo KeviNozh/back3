@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rutas - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗺️</span>
+    <span>Gestión de Rutas</span>
+</div>
+
+<!-- BLOQUE DE PERMISOS PARA NO-ADMIN -->
+{% if user.is_authenticated and user.perfilusuario.tipo_usuario != 'ADMIN' and not user.is_superuser %}
+<div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+        <span>🔒</span>
+        <div>
+            <strong>Modo Solo Lectura</strong>
+            <div style="font-size: 0.9rem; opacity: 0.9;">
+                Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información de rutas.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Mensajes del sistema -->
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="filters">
+    <div class="filter-group">
+        <select class="filter-select" id="filter-transport">
+            <option value="">Todos los transportes</option>
+            <option value="TERRESTRE">Terrestre</option>
+            <option value="AEREO">Aéreo</option>
+        </select>
+    </div>
+    <input type="text" class="search-input" id="search-input" placeholder="Buscar ruta...">
+    
+    <!-- Solo mostrar botón para admin -->
+    {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+    <button class="btn" onclick="window.location.href='{% url 'ruta_create' %}'">➕ Nueva Ruta</button>
+    {% endif %}
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">Lista de Rutas</div>
+        <div id="route-count" style="color: var(--text-secondary); font-size: 0.9rem;">
+            Total: {{ rutas|length }} rutas
+        </div>
+    </div>
+    
+    {% if rutas %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Tipo Transporte</th>
+                <th>Distancia (km)</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ruta in rutas %}
+            <tr>
+                <td>{{ ruta.origen }}</td>
+                <td>{{ ruta.destino }}</td>
+                <td>
+                    <span class="badge {% if ruta.tipo_transporte == 'TERRESTRE' %}info{% else %}warning{% endif %}">
+                        {{ ruta.tipo_transporte }}
+                    </span>
+                </td>
+                <td>{{ ruta.distancia_km }}</td>
+                <td>
+                    <button class="action-btn" onclick="viewRoute({{ ruta.id }})">Ver</button>
+                    
+                    <!-- Solo admin puede editar/eliminar -->
+                    {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+                    <button class="action-btn" onclick="editRoute({{ ruta.id }})">Editar</button>
+                    <button class="action-btn delete" onclick="deleteRoute({{ ruta.id }})">Eliminar</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
+        <h3>No hay rutas registradas</h3>
+        <p style="margin-top: 0.5rem;">Comienza creando la primera ruta en el sistema.</p>
+        
+        {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+        <button class="btn" onclick="window.location.href='{% url 'ruta_create' %}'" style="margin-top: 1rem;">
+            ➕ Crear Primera Ruta
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Funciones de acción para las rutas
+function viewRoute(routeId) {
+    window.location.href = `/rutas/${routeId}/`;
+}
+
+function editRoute(routeId) {
+    window.location.href = `/rutas/${routeId}/editar/`;
+}
+
+function deleteRoute(routeId) {
+    if (confirm('¿Está seguro de que desea eliminar esta ruta? Esta acción no se puede deshacer.')) {
+        window.location.href = `/rutas/${routeId}/eliminar/`;
+    }
+}
+
+// Filtros y búsqueda
+document.addEventListener('DOMContentLoaded', function() {
+    const filterTransport = document.getElementById('filter-transport');
+    const searchInput = document.getElementById('search-input');
+    
+    function filterRoutes() {
+        const transportValue = filterTransport.value;
+        const searchValue = searchInput.value.toLowerCase();
+        const rows = document.querySelectorAll('.table tbody tr');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const transport = row.cells[2].textContent.trim();
+            const origin = row.cells[0].textContent.toLowerCase();
+            const destination = row.cells[1].textContent.toLowerCase();
+            
+            const matchesTransport = !transportValue || transport === transportValue;
+            const matchesSearch = !searchValue || 
+                                origin.includes(searchValue) || 
+                                destination.includes(searchValue);
+            
+            if (matchesTransport && matchesSearch) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('route-count').textContent = `Total: ${visibleCount} rutas`;
+    }
+    
+    filterTransport.addEventListener('change', filterRoutes);
+    searchInput.addEventListener('input', filterRoutes);
+    
+    // Ocultar botones de acción para no-admin
+    {% if user.is_authenticated and user.perfilusuario.tipo_usuario != 'ADMIN' and not user.is_superuser %}
+    const actionButtons = document.querySelectorAll('.action-btn.delete, .action-btn:nth-child(2)');
+    actionButtons.forEach(btn => {
+        if (btn.textContent === 'Editar' || btn.textContent === 'Eliminar') {
+            btn.style.display = 'none';
+        }
+    });
+    {% endif %}
+});
+</script>
+
+<style>
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-select, .search-input {
+    padding: 0.8rem 1.2rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    min-width: 180px;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 250px;
+}
+
+.action-btn {
+    padding: 0.4rem 0.8rem;
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+}
+
+.action-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.action-btn.delete {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+.action-btn.delete:hover {
+    background: var(--danger);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-select, .search-input {
+        min-width: 100%;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Usuario - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👤</span>
+    <span>Editar Usuario: {{ usuario_editar.username }}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Información Básica -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>📝</span>
+                <span>Información Básica</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Nombre de Usuario</label>
+                    <input type="text" class="form-input" value="{{ usuario_editar.username }}" readonly>
+                    <small style="color: var(--text-secondary);">No se puede modificar</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo de Usuario *</label>
+                    <select class="form-select" name="tipo_usuario" required>
+                        {% for value, label in tipos_usuario %}
+                        <option value="{{ value }}" {% if perfil.tipo_usuario == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-input" name="first_name" value="{{ usuario_editar.first_name }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellido</label>
+                    <input type="text" class="form-input" name="last_name" value="{{ usuario_editar.last_name }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" name="email" value="{{ usuario_editar.email }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="text" class="form-input" name="telefono" value="{{ perfil.telefono }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Asignaciones Específicas -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🔗</span>
+                <span>Asignaciones Específicas</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Conductor Asignado</label>
+                    <select class="form-select" name="conductor_asignado">
+                        <option value="">Sin asignar</option>
+                        {% for conductor in conductores %}
+                        <option value="{{ conductor.id }}" 
+                            {% if perfil.conductor_asignado and perfil.conductor_asignado.id == conductor.id %}selected{% endif %}>
+                            {{ conductor.nombre }} ({{ conductor.licencia }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Piloto Asignado</label>
+                    <select class="form-select" name="piloto_asignado">
+                        <option value="">Sin asignar</option>
+                        {% for piloto in pilotos %}
+                        <option value="{{ piloto.id }}" 
+                            {% if perfil.piloto_asignado and perfil.piloto_asignado.id == piloto.id %}selected{% endif %}>
+                            {{ piloto.nombre }} ({{ piloto.certificacion }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🔄</span>
+                <span>Estado</span>
+            </h3>
+            <div class="form-group">
+                <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" name="is_active" {% if usuario_editar.is_active %}checked{% endif %}>
+                    <span>Usuario Activo</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Usuario</button>
+            <a href="{% url 'gestion_usuarios' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .content-card > div > div {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

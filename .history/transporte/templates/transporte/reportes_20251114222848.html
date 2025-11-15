@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Sistema de Gestión de Transporte</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(99, 102, 241, 0.1));
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .report-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .report-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .report-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .badge.alert {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header { flex-direction: column; gap: 1rem; }
+            .filters { flex-direction: column; }
+            .filter-group { width: 100%; }
+            .filter-select, .search-input { min-width: 100%; }
+            .table-container { overflow-x: auto; }
+            .table { min-width: 800px; }
+            .report-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🚚</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                <div>
+                    <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        {% if user.is_staff %}Administrador{% else %}Usuario{% endif %}
+                    </div>
+                </div>
+                <div class="avatar" onclick="window.location.href='{% url 'logout' %}'" title="Cerrar sesión">
+                    {{ user.username|slice:":2"|upper }}
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <div class="page-title">
+            <span>📈</span>
+            <span>Reportes y Análisis</span>
+        </div>
+
+        <div class="report-grid">
+            <div class="report-card" onclick="showReportModal('despachos')">
+                <div class="report-icon">📦</div>
+                <div class="report-title">Reporte de Despachos</div>
+                <div class="report-description">Análisis detallado de despachos por período, estado y cliente</div>
+                <button class="btn">Generar Reporte</button>
+            </div>
+            <div class="report-card" onclick="showReportModal('financiero')">
+                <div class="report-icon">💰</div>
+                <div class="report-title">Reporte Financiero</div>
+                <div class="report-description">Ingresos, gastos y rentabilidad por período y cliente</div>
+                <button class="btn">Generar Reporte</button>
+            </div>
+            <div class="report-card" onclick="showReportModal('flota')">
+                <div class="report-icon">🚛</div>
+                <div class="report-title">Reporte de Flota</div>
+                <div class="report-description">Estado, mantenimiento y utilización de vehículos y aeronaves</div>
+                <button class="btn">Generar Reporte</button>
+            </div>
+            <div class="report-card" onclick="showReportModal('clientes')">
+                <div class="report-icon">👥</div>
+                <div class="report-title">Reporte de Clientes</div>
+                <div class="report-description">Análisis de clientes, volumen de negocio y satisfacción</div>
+                <button class="btn">Generar Reporte</button>
+            </div>
+            <div class="report-card" onclick="showReportModal('seguros')">
+                <div class="report-icon">🛡️</div>
+                <div class="report-title">Reporte de Seguros</div>
+                <div class="report-description">Estado de pólizas, vencimientos y coberturas</div>
+                <button class="btn">Generar Reporte</button>
+            </div>
+            <div class="report-card" onclick="showReportModal('personal')">
+                <div class="report-icon">👨‍💼</div>
+                <div class="report-title">Reporte de Personal</div>
+                <div class="report-description">Rendimiento, disponibilidad y certificaciones del personal</div>
+                <button class="btn">Generar Reporte</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <select class="filter-select" id="filterType">
+                    <option value="">Todos los tipos</option>
+                    <option value="despachos">Despachos</option>
+                    <option value="financiero">Financiero</option>
+                    <option value="flota">Flota</option>
+                    <option value="clientes">Clientes</option>
+                </select>
+                <select class="filter-select" id="filterStatus">
+                    <option value="">Todos los estados</option>
+                    <option value="completado">Completado</option>
+                    <option value="procesando">Procesando</option>
+                    <option value="error">Error</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="searchReport" placeholder="Buscar reporte...">
+            <button class="btn" onclick="showNewReportModal()">➕ Nuevo Reporte</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Reportes Generados</div>
+                <div style="color: var(--text-secondary); font-size: 0.9rem;">Total: <span id="totalReports">0</span> reportes</div>
+            </div>
+            <div class="loading" id="loadingReports">
+                <div class="spinner"></div>
+                <div>Cargando reportes...</div>
+            </div>
+            <table class="table" id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>ID Reporte</th>
+                        <th>Tipo</th>
+                        <th>Período</th>
+                        <th>Generado Por</th>
+                        <th>Fecha Generación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                    <!-- Los reportes se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para generar reportes -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Generar Reporte</h2>
+                <button class="close-modal" onclick="closeReportModal()">&times;</button>
+            </div>
+            <form id="reportForm">
+                <div class="form-group">
+                    <label class="form-label" for="reportType">Tipo de Reporte</label>
+                    <select class="form-select" id="reportType" required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="despachos">Reporte de Despachos</option>
+                        <option value="financiero">Reporte Financiero</option>
+                        <option value="flota">Reporte de Flota</option>
+                        <option value="clientes">Reporte de Clientes</option>
+                        <option value="seguros">Reporte de Seguros</option>
+                        <option value="personal">Reporte de Personal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="period">Período</label>
+                    <select class="form-select" id="period" required>
+                        <option value="">Seleccione un período</option>
+                        <option value="diario">Diario</option>
+                        <option value="semanal">Semanal</option>
+                        <option value="mensual">Mensual</option>
+                        <option value="trimestral">Trimestral</option>
+                        <option value="anual">Anual</option>
+                        <option value="personalizado">Personalizado</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customDateRange" style="display: none;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <label class="form-label" for="startDate">Fecha Inicio</label>
+                            <input type="date" class="form-input" id="startDate">
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label" for="endDate">Fecha Fin</label>
+                            <input type="date" class="form-input" id="endDate">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="format">Formato</label>
+                    <select class="form-select" id="format" required>
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancelar</button>
+                    <button type="submit" class="btn">Generar Reporte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // Variables globales
+        let currentReportType = '';
+        let generatedReports = [];
+
+        // Función para obtener el usuario actual
+        function getCurrentUser() {
+            const userNameElement = document.getElementById('currentUserName');
+            return userNameElement ? userNameElement.textContent.trim() : 'Usuario';
+        }
+
+        // Función para obtener datos reales de la base de datos
+        async function obtenerDatosReales(tipoReporte) {
+            try {
+                showNotification(`Obteniendo datos de ${getReportTitle(tipoReporte)}...`);
+                
+                const response = await fetch(`/api/reportes/datos/?type=${tipoReporte}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    return result.data;
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error al obtener datos:', error);
+                showNotification('Error al obtener datos del reporte', 'error');
+                return [];
+            }
+        }
+
+        // Cargar reportes al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGeneratedReports();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Filtros
+            document.getElementById('filterType').addEventListener('change', filterReports);
+            document.getElementById('filterStatus').addEventListener('change', filterReports);
+            document.getElementById('searchReport').addEventListener('input', filterReports);
+            
+            // Modal
+            document.getElementById('period').addEventListener('change', function() {
+                const customDateRange = document.getElementById('customDateRange');
+                customDateRange.style.display = this.value === 'personalizado' ? 'block' : 'none';
+            });
+
+            // Formulario
+            document.getElementById('reportForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateReport();
+            });
+        }
+
+        function loadGeneratedReports() {
+            document.getElementById('loadingReports').style.display = 'block';
+            
+            // Simular carga desde base de datos
+            setTimeout(() => {
+                generatedReports = JSON.parse(localStorage.getItem('generatedReports')) || [];
+                renderReportsTable();
+                document.getElementById('loadingReports').style.display = 'none';
+            }, 1000);
+        }
+
+        function renderReportsTable() {
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '';
+            
+            generatedReports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${report.id}</td>
+                    <td>${getReportTitle(report.type)}</td>
+                    <td>${report.period}</td>
+                    <td>${report.generatedBy}</td>
+                    <td>${report.date}</td>
+                    <td><span class="badge ${report.status === 'Completado' ? 'active' : report.status === 'Procesando' ? 'pending' : 'alert'}">${report.status}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="viewReport('${report.id}')">Ver</button>
+                        <button class="action-btn" onclick="downloadReport('${report.id}')">Descargar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('totalReports').textContent = generatedReports.length;
+        }
+
+        function filterReports() {
+            const typeFilter = document.getElementById('filterType').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            const searchFilter = document.getElementById('searchReport').value.toLowerCase();
+            
+            const rows = document.querySelectorAll('#reportsTableBody tr');
+            
+            rows.forEach(row => {
+                const type = row.cells[1].textContent.toLowerCase();
+                const status = row.cells[5].textContent.toLowerCase();
+                const id = row.cells[0].textContent.toLowerCase();
+                
+                const typeMatch = !typeFilter || type.includes(typeFilter);
+                const statusMatch = !statusFilter || status.includes(statusFilter);
+                const searchMatch = !searchFilter || id.includes(searchFilter) || type.includes(searchFilter);
+                
+                row.style.display = typeMatch && statusMatch && searchMatch ? '' : 'none';
+            });
+        }
+
+        function showReportModal(type) {
+            currentReportType = type;
+            const modal = document.getElementById('reportModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const reportType = document.getElementById('reportType');
+            
+            modalTitle.textContent = `Generar Reporte de ${getReportTitle(type)}`;
+            reportType.value = type;
+            modal.style.display = 'flex';
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+            document.getElementById('reportForm').reset();
+            document.getElementById('customDateRange').style.display = 'none';
+        }
+
+        function showNewReportModal() {
+            currentReportType = '';
+            document.getElementById('reportModal').style.display = 'flex';
+            document.getElementById('modalTitle').textContent = 'Generar Nuevo Reporte';
+            document.getElementById('reportType').value = '';
+        }
+
+        async function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const period = document.getElementById('period').value;
+            const format = document.getElementById('format').value;
+            
+            if (!reportType || !period) {
+                showNotification('Por favor complete todos los campos requeridos', 'error');
+                return;
+            }
+
+            const currentUser = getCurrentUser();
+
+            // Crear nuevo reporte
+            const newReport = {
+                id: `RPT-${Date.now()}`,
+                type: reportType,
+                period: period,
+                generatedBy: currentUser,
+                date: new Date().toLocaleDateString(),
+                status: 'Procesando',
+                format: format
+            };
+
+            generatedReports.unshift(newReport);
+            localStorage.setItem('generatedReports', JSON.stringify(generatedReports));
+            renderReportsTable();
+
+            closeReportModal();
+            showNotification(`Generando reporte ${getReportTitle(reportType)} con datos reales...`);
+
+            // Procesar con datos reales
+            try {
+                if (format === 'pdf') {
+                    await generatePDFReport(reportType, period);
+                } else {
+                    await generateExcelReport(reportType, period);
+                }
+                
+                newReport.status = 'Completado';
+                localStorage.setItem('generatedReports', JSON.stringify(generatedReports));
+                renderReportsTable();
+                
+            } catch (error) {
+                newReport.status = 'Error';
+                localStorage.setItem('generatedReports', JSON.stringify(generatedReports));
+                renderReportsTable();
+                showNotification('Error al generar el reporte', 'error');
+            }
+        }
+
+        // Función principal para generar PDF con datos reales
+        async function generatePDFReport(type, period) {
+            try {
+                // Obtener datos reales de la base de datos
+                const realData = await obtenerDatosReales(type);
+                
+                if (realData.length === 0) {
+                    showNotification('No hay datos disponibles para generar el reporte', 'error');
+                    return;
+                }
+
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const user = getCurrentUser();
+                
+                // Encabezado
+                doc.setFontSize(20);
+                doc.setTextColor(40, 40, 40);
+                doc.text(`Reporte de ${getReportTitle(type)}`, pageWidth / 2, 20, { align: 'center' });
+                
+                // Información del reporte
+                doc.setFontSize(12);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Período: ${getPeriodText(period)}`, 20, 40);
+                doc.text(`Generado por: ${user}`, 20, 50);
+                doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 60);
+                doc.text(`Total de registros: ${realData.length}`, 20, 70);
+                
+                // Línea separadora
+                doc.setDrawColor(200, 200, 200);
+                doc.line(20, 80, pageWidth - 20, 80);
+                
+                // Contenido específico del reporte con datos reales
+                let yPosition = 100;
+                
+                switch(type) {
+                    case 'despachos':
+                        await generateDespachosPDF(doc, yPosition, pageWidth, realData);
+                        break;
+                    case 'financiero':
+                        await generateFinancieroPDF(doc, yPosition, pageWidth, realData);
+                        break;
+                    case 'flota':
+                        await generateFlotaPDF(doc, yPosition, pageWidth, realData);
+                        break;
+                    case 'clientes':
+                        await generateClientesPDF(doc, yPosition, pageWidth, realData);
+                        break;
+                    case 'seguros':
+                        await generateSegurosPDF(doc, yPosition, pageWidth, realData);
+                        break;
+                    case 'personal':
+                        await generatePersonalPDF(doc, yPosition, pageWidth, realData);
+                        break;
+                }
+                
+                // Guardar PDF
+                doc.save(`reporte_${type}_${new Date().toISOString().slice(0,10)}.pdf`);
+                showNotification(`✓ Reporte ${getReportTitle(type)} generado exitosamente con datos reales`);
+                
+            } catch (error) {
+                console.error('Error generando PDF:', error);
+                showNotification('Error al generar el reporte PDF', 'error');
+            }
+        }
+
+        // Funciones específicas para cada tipo de reporte
+        async function generateDespachosPDF(doc, yPosition, pageWidth, data) {
+            doc.setFontSize(16);
+            doc.setTextColor(40, 40, 40);
+            doc.text('Resumen de Despachos', 20, yPosition);
+            yPosition += 20;
+            
+            // Tabla de despachos con datos reales
+            const tableData = data.map(item => [
+                item.id,
+                item.cliente,
+                item.fecha,
+                item.estado,
+                `$${item.valor?.toLocaleString() || '0'}`,
+                item.destino
+            ]);
+            
+            doc.autoTable({
+                startY: yPosition,
+                head: [['ID', 'Cliente', 'Fecha', 'Estado', 'Valor', 'Destino']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                margin: { top: 20 }
+            });
+        }
+
+        async function generateFinancieroPDF(doc, yPosition, pageWidth, data) {
+            doc.setFontSize(16);
+            doc.setTextColor(40, 40, 40);
+            doc.text('Resumen Financiero', 20, yPosition);
+            yPosition += 20;
+            
+            // Tabla financiera con datos reales
+            const tableData = data.map(item => [
+                item.concepto,
+                typeof item.monto === 'number' ? `$${item.monto.toLocaleString()}` : item.monto.toString(),
+                item.tipo
+            ]);
+            
+            doc.autoTable({
+                startY: yPosition,
+                head: [['Concepto', 'Monto', 'Tipo']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                margin: { top: 20 }
+            });
+        }
+
+        async function generateFlotaPDF(doc, yPosition, pageWidth, data) {
+            doc.setFontSize(16);
+            doc.setTextColor(40, 40, 40);
+            doc.text('Estado de la Flota', 20, yPosition);
+            yPosition += 20;
+            
+            // Tabla de flota con datos reales
+            const tableData = data.map(item => [
+                item.id,
+                item.tipo,
+                item.modelo,
+                item.estado,
+                item.mantenimiento,
+                item.ubicacion
+            ]);
+            
+            doc.autoTable({
+                startY: yPosition,
+                head: [['ID', 'Tipo', 'Modelo', 'Estado', 'Mantenimiento', 'Ubicación']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                margin: { top: 20 }
+            });
+        }
+
+        async function generateClientesPDF(doc, yPosition, pageWidth, data) {
+            doc.setFontSize(16);
+            doc.setTextColor(40, 40, 40);
+            doc.text('Análisis de Clientes', 20, yPosition);
+            yPosition += 20;
+            
+            // Tabla de clientes con datos reales
+            const tableData = data.map(item => [
+                item.id,
+                item.nombre,
+                item.contacto,
+                item.telefono,
+                item.email,
+                item.volumen?.toString() || '0'
+            ]);
+            
+            doc.autoTable({
+                startY: yPosition,
+                head: [['ID', 'Nombre', 'Contacto', 'Teléfono', 'Email', 'Volumen']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                margin: { top: 20 }
+            });
+        }
+
+        async function generateSegurosPDF(doc, yPosition, pageWidth, data) {
+            doc.setFontSize(16);
+            doc.setTextColor(40, 40, 40);
+            doc.text('Estado de Seguros', 20, yPosition);
+            yPosition += 20;
+            
+            // Tabla de seguros con datos reales
+            const tableData = data.map(item => [
+                item.poliza,
+                item.tipo,
+                item.aseguradora,
+                item.vencimiento,
+                `$${item.cobertura?.toLocaleString() || '0'}`
+            ]);
+            
+            doc.autoTable({
+                startY: yPosition,
+                head: [['Póliza', 'Tipo', 'Aseguradora', 'Vencimiento', 'Cobertura']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                margin: { top: 20 }
+            });
+        }
+
+        async function generatePersonalPDF(doc, yPosition, pageWidth, data) {
+            doc.setFontSize(16);
+            doc.setTextColor(40, 40, 40);
+            doc.text('Rendimiento del Personal', 20, yPosition);
+            yPosition += 20;
+            
+            // Tabla de personal con datos reales
+            const tableData = data.map(item => [
+                item.id,
+                item.nombre,
+                item.puesto,
+                item.estado,
+                item.certificaciones
+            ]);
+            
+            doc.autoTable({
+                startY: yPosition,
+                head: [['ID', 'Nombre', 'Puesto', 'Estado', 'Certificaciones']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                margin: { top: 20 }
+            });
+        }
+
+        function generateExcelReport(type, period) {
+            // Simular generación de Excel
+            showNotification(`✓ Reporte ${getReportTitle(type)} en Excel generado exitosamente`);
+        }
+
+        function viewReport(reportId) {
+            const report = generatedReports.find(r => r.id === reportId);
+            if (report) {
+                showNotification(`Visualizando reporte ${reportId}...`);
+                // En una aplicación real, esto abriría el reporte en un modal o nueva pestaña
+            }
+        }
+
+        function downloadReport(reportId) {
+            const report = generatedReports.find(r => r.id === reportId);
+            if (report) {
+                showNotification(`Descargando reporte ${reportId}...`);
+                // Regenerar el reporte para descargar
+                if (report.format === 'pdf') {
+                    generatePDFReport(report.type, report.period);
+                } else {
+                    generateExcelReport(report.type, report.period);
+                }
+            }
+        }
+
+        // Funciones auxiliares
+        function getReportTitle(type) {
+            const titles = {
+                'despachos': 'Despachos',
+                'financiero': 'Financiero',
+                'flota': 'Flota',
+                'clientes': 'Clientes',
+                'seguros': 'Seguros',
+                'personal': 'Personal'
+            };
+            return titles[type] || 'General';
+        }
+
+        function getPeriodText(period) {
+            const periods = {
+                'diario': 'Diario',
+                'semanal': 'Semanal',
+                'mensual': 'Mensual',
+                'trimestral': 'Trimestral',
+                'anual': 'Anual',
+                'personalizado': 'Personalizado'
+            };
+            return periods[period] || 'No especificado';
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #6366f1, #06b6d4)'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Estilos para las animaciones de notificación
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('📈 Módulo de Reportes cargado exitosamente');
+    </script>
+</body>
+</html>

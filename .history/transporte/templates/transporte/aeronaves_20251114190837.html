@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aeronaves - Sistema de Gestión de Transporte</title>
+    <style>
+        /* MANTENER TODOS LOS ESTILOS ORIGINALES EXACTAMENTE IGUAL */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.maintenance {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .badge.inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.cargo {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.passenger {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .badge.mixed {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.6rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select, .search-input {
+                min-width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 800px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">✈️</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                <div>
+                    <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        {% if user.is_staff %}Administrador{% else %}Usuario{% endif %}
+                    </div>
+                </div>
+                <div class="avatar" onclick="window.location.href='{% url 'logout' %}'" title="Cerrar sesión">
+                    {{ user.username|slice:":2"|upper }}
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <div class="page-title">
+            <span>✈️</span>
+            <span>Gestión de Aeronaves</span>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <select class="filter-select" id="filter-status">
+                    <option value="">Todos los estados</option>
+                    <option value="active">Activa</option>
+                    <option value="maintenance">En Mantenimiento</option>
+                    <option value="inactive">Inactiva</option>
+                </select>
+                <select class="filter-select" id="filter-type">
+                    <option value="">Todos los tipos</option>
+                    <option value="cargo">Carga</option>
+                    <option value="passenger">Pasajeros</option>
+                    <option value="mixed">Mixto</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar aeronave...">
+            <button class="btn" id="new-aircraft-btn">➕ Nueva Aeronave</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Aeronaves</div>
+                <div id="aircraft-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Matrícula</th>
+                        <th>Modelo</th>
+                        <th>Tipo</th>
+                        <th>Capacidad</th>
+                        <th>Piloto Asignado</th>
+                        <th>Estado</th>
+                        <th>Último Mantenimiento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="aircraft-table-body">
+                    <tr>
+                        <td colspan="8" class="loading">Cargando datos de aeronaves desde la base de datos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para crear nueva aeronave -->
+    <div id="newAircraftModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('newAircraftModal')">&times;</span>
+            <h3>Nueva Aeronave</h3>
+            <form id="newAircraftForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Matrícula</label>
+                        <input type="text" class="form-input" name="matricula" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Aeronave</label>
+                        <select class="form-select" name="tipo_aeronave" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Carga">Carga</option>
+                            <option value="Pasajeros">Pasajeros</option>
+                            <option value="Mixto">Mixto</option>
+                            <option value="Privado">Privado</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Modelo</label>
+                        <input type="text" class="form-input" name="modelo" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Capacidad (kg)</label>
+                        <input type="number" class="form-input" name="capacidad_kg" required min="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Piloto Asignado</label>
+                    <select class="form-select" name="piloto_asignado" id="piloto-select">
+                        <option value="">Sin asignar</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="activo" checked> Activa
+                    </label>
+                </div>
+                
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newAircraftModal')">Cancelar</button>
+                    <button type="submit" class="btn">Crear Aeronave</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variable global para almacenar las aeronaves
+        let aircraftData = [];
+
+        // Función para cargar aeronaves desde la base de datos
+        async function loadAircraftFromDatabase() {
+            try {
+                showLoadingState();
+                
+                // Aquí se haría la llamada real a tu API o backend
+                const response = await fetch('/api/aeronaves/');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar las aeronaves');
+                }
+                
+                aircraftData = await response.json();
+                renderAircraftTable(aircraftData);
+                showNotification('Datos de aeronaves cargados correctamente');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorState('Error al cargar las aeronaves: ' + error.message);
+            }
+        }
+
+        // Función para mostrar estado de carga
+        function showLoadingState() {
+            const tableBody = document.getElementById('aircraft-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="loading">Cargando datos de aeronaves desde la base de datos...</td>
+                </tr>
+            `;
+            document.getElementById('aircraft-count').textContent = 'Cargando...';
+        }
+
+        // Función para mostrar estado de error
+        function showErrorState(message) {
+            const tableBody = document.getElementById('aircraft-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8">
+                        <div class="error">
+                            ${message}
+                            <br>
+                            <button class="btn" onclick="loadAircraftFromDatabase()" style="margin-top: 1rem;">
+                                Reintentar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('aircraft-count').textContent = 'Error';
+        }
+
+        // Función para simular fecha de último mantenimiento (ya que no existe en el modelo)
+        function getLastMaintenanceDate(aircraftId) {
+            // Simular una fecha basada en el ID para mantener el diseño
+            const dates = ['2023-11-15', '2023-12-01', '2024-01-10', '2024-02-05'];
+            return dates[aircraftId % dates.length];
+        }
+
+        // Función para formatear fecha
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        // Función para renderizar la tabla de aeronaves
+        function renderAircraftTable(aircraft) {
+            const tableBody = document.getElementById('aircraft-table-body');
+            const aircraftCount = document.getElementById('aircraft-count');
+            
+            if (aircraft.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="loading">No se encontraron aeronaves en la base de datos</td>
+                    </tr>
+                `;
+                aircraftCount.textContent = 'Total: 0 aeronaves';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            aircraftCount.textContent = `Total: ${aircraft.length} aeronaves`;
+            
+            aircraft.forEach(aircraft => {
+                const row = document.createElement('tr');
+                
+                // USAR CAMPOS REALES DE LA BASE DE DATOS
+                // Estado basado en el campo 'activo' (booleano)
+                let statusClass = '';
+                let statusText = '';
+                
+                if (aircraft.activo) {
+                    statusClass = 'active';
+                    statusText = 'Activa';
+                } else {
+                    statusClass = 'inactive';
+                    statusText = 'Inactiva';
+                }
+
+                // Tipo basado en el campo 'tipo_aeronave'
+                let typeClass = '';
+                let typeText = aircraft.tipo_aeronave || 'N/A';
+                
+                // Mapear tipos a clases CSS existentes
+                if (typeText.toLowerCase().includes('carga')) {
+                    typeClass = 'cargo';
+                } else if (typeText.toLowerCase().includes('pasajero')) {
+                    typeClass = 'passenger';
+                } else if (typeText.toLowerCase().includes('mixto')) {
+                    typeClass = 'mixed';
+                } else {
+                    typeClass = 'cargo'; // default
+                }
+
+                // Piloto asignado
+                const pilotName = aircraft.piloto_asignado ? 
+                    (aircraft.piloto_asignado_nombre || aircraft.piloto_asignado.nombre || 'Asignado') : 
+                    'Sin asignar';
+                
+                // Simular último mantenimiento (campo que no existe en el modelo)
+                const lastMaintenance = getLastMaintenanceDate(aircraft.id);
+                
+                row.innerHTML = `
+                    <td>${aircraft.matricula || aircraft.id}</td>
+                    <td>${aircraft.modelo || 'N/A'}</td>
+                    <td><span class="badge ${typeClass}">${typeText}</span></td>
+                    <td>${aircraft.capacidad_kg ? aircraft.capacidad_kg + ' kg' : 'N/A'}</td>
+                    <td>${pilotName}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>${formatDate(lastMaintenance)}</td>
+                    <td>
+                        <button class="action-btn" onclick="viewAircraft('${aircraft.matricula || aircraft.id}')">Ver</button>
+                        <button class="action-btn" onclick="editAircraft(${aircraft.id})">Editar</button>
+                        <button class="action-btn delete" onclick="deleteAircraft('${aircraft.matricula || aircraft.id}')">Eliminar</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para filtrar aeronaves
+        function filterAircraft() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            
+            const filteredAircraft = aircraftData.filter(aircraft => {
+                // Filtro por estado (usando campo 'activo' real)
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && aircraft.activo) ||
+                    (statusFilter === 'inactive' && !aircraft.activo) ||
+                    (statusFilter === 'maintenance' && !aircraft.activo); // Considerar inactivo como mantenimiento
+                
+                // Filtro por tipo (usando campo 'tipo_aeronave' real)
+                const matchesType = !typeFilter || 
+                    (typeFilter === 'cargo' && aircraft.tipo_aeronave && aircraft.tipo_aeronave.toLowerCase().includes('carga')) ||
+                    (typeFilter === 'passenger' && aircraft.tipo_aeronave && aircraft.tipo_aeronave.toLowerCase().includes('pasajero')) ||
+                    (typeFilter === 'mixed' && aircraft.tipo_aeronave && aircraft.tipo_aeronave.toLowerCase().includes('mixto'));
+                
+                // Filtro por búsqueda
+                const matchesSearch = !searchText || 
+                    (aircraft.matricula && aircraft.matricula.toLowerCase().includes(searchText)) ||
+                    (aircraft.modelo && aircraft.modelo.toLowerCase().includes(searchText)) ||
+                    (aircraft.piloto_asignado_nombre && aircraft.piloto_asignado_nombre.toLowerCase().includes(searchText));
+                
+                return matchesStatus && matchesType && matchesSearch;
+            });
+            
+            renderAircraftTable(filteredAircraft);
+        }
+
+        // Funciones de acción para las aeronaves
+        async function viewAircraft(aircraftId) {
+            try {
+                const response = await fetch(`/api/aeronaves/${aircraftId}/`);
+                const aircraftDetails = await response.json();
+                
+                showNotification(`Viendo detalles de la aeronave ${aircraftId}`);
+                console.log('Detalles de la aeronave:', aircraftDetails);
+                
+            } catch (error) {
+                console.error('Error al obtener detalles:', error);
+                showNotification('Error al cargar detalles de la aeronave');
+            }
+        }
+
+        async function editAircraft(aircraftId) {
+            showNotification(`Editando la aeronave ${aircraftId}`);
+            // Redirigir a página de edición
+            window.location.href = `/aeronaves/${aircraftId}/editar/`;
+        }
+
+        async function deleteAircraft(aircraftId) {
+        if (confirm(`¿Está seguro de que desea eliminar la aeronave ${aircraftId}? Esta acción no se puede deshacer.`)) {
+            try {
+                showNotification('Eliminando aeronave...', 'warning');
+                
+                const response = await fetch(`/aeronaves/${aircraftId}/eliminar/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    // Recargar la tabla después de eliminar
+                    await loadAircraftFromDatabase();
+                } else {
+                    throw new Error(result.error || 'Error al eliminar la aeronave');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error al eliminar la aeronave: ' + error.message, 'error');
+            }
+        }
+    }
+
+        // Funciones para el modal de nueva aeronave
+        async function showNewAircraftModal() {
+            await loadPilotosForSelect();
+            showModal('newAircraftModal');
+        }
+
+        async function loadPilotosForSelect() {
+            try {
+                const response = await fetch('/api/pilotos/');
+                if (response.ok) {
+                    const pilotos = await response.json();
+                    const select = document.getElementById('piloto-select');
+                    
+                    // Limpiar opciones excepto la primera
+                    while (select.children.length > 1) {
+                        select.removeChild(select.lastChild);
+                    }
+                    
+                    // Agregar pilotos activos
+                    pilotos.forEach(piloto => {
+                        if (piloto.activo) {
+                            const option = document.createElement('option');
+                            option.value = piloto.id;
+                            option.textContent = `${piloto.nombre} (${piloto.certificacion})`;
+                            select.appendChild(option);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar pilotos:', error);
+            }
+        }
+
+        async function createAircraft(formData) {
+            try {
+                const response = await fetch('/api/aeronaves/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    const newAircraft = await response.json();
+                    showNotification('Aeronave creada exitosamente');
+                    closeModal('newAircraftModal');
+                    await loadAircraftFromDatabase();
+                    return newAircraft;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al crear la aeronave');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error al crear la aeronave: ' + error.message);
+                throw error;
+            }
+        }
+
+        function handleAircraftFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                matricula: document.querySelector('input[name="matricula"]').value,
+                tipo_aeronave: document.querySelector('select[name="tipo_aeronave"]').value,
+                modelo: document.querySelector('input[name="modelo"]').value,
+                capacidad_kg: parseInt(document.querySelector('input[name="capacidad_kg"]').value),
+                activo: document.querySelector('input[name="activo"]').checked,
+                piloto_asignado: document.querySelector('select[name="piloto_asignado"]').value || null
+            };
+            
+            createAircraft(formData);
+        }
+
+        // Funciones auxiliares para modals
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Resetear formulario
+            if (modalId === 'newAircraftModal') {
+                document.getElementById('newAircraftForm').reset();
+            }
+        }
+
+        // Función auxiliar para obtener el token CSRF
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = `✓ ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #6366f1, #06b6d4);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Inicialización cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAircraftFromDatabase();
+            
+            document.getElementById('filter-status').addEventListener('change', filterAircraft);
+            document.getElementById('filter-type').addEventListener('change', filterAircraft);
+            document.getElementById('search-input').addEventListener('input', filterAircraft);
+            
+            // Actualizado para abrir el modal
+            document.getElementById('new-aircraft-btn').addEventListener('click', showNewAircraftModal);
+            
+            // Agregar event listener para el formulario
+            document.getElementById('newAircraftForm').addEventListener('submit', handleAircraftFormSubmit);
+            
+            console.log('✈️ Módulo de Aeronaves cargado exitosamente');
+        });
+
+        // Estilos para las animaciones de notificaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutas - Sistema de Gestión de Transporte</title>
+    <style>
+        /* MANTENER TODOS LOS ESTILOS ORIGINALES EXACTAMENTE IGUAL */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.terrestre {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.aereo {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .badge.activa {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.inactiva {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.6rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select, .search-input {
+                min-width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🗺️</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                <div>
+                    <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        {% if user.perfilusuario.tipo_usuario == 'ADMIN' %}Administrador
+                        {% elif user.perfilusuario.tipo_usuario == 'CLIENTE' %}Cliente
+                        {% elif user.perfilusuario.tipo_usuario == 'CONDUCTOR' %}Conductor
+                        {% elif user.perfilusuario.tipo_usuario == 'PILOTO' %}Piloto
+                        {% else %}Usuario{% endif %}
+                    </div>
+                </div>
+                <div class="avatar" onclick="window.location.href='{% url 'logout' %}'" title="Cerrar sesión">
+                    {{ user.username|slice:":2"|upper }}
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+            <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            {% endif %}
+            <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <!-- BLOQUE DE PERMISOS PARA NO-ADMIN -->
+        {% if user.is_authenticated and user.perfilusuario.tipo_usuario != 'ADMIN' %}
+        <style>
+            #new-route-btn,
+            .btn[onclick*="crear"],
+            .btn[onclick*="editar"],
+            .btn[onclick*="eliminar"],
+            .action-btn.delete,
+            .btn-danger {
+                display: none !important;
+            }
+        </style>
+        
+        <div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+                <span>🔒</span>
+                <div>
+                    <strong>Modo Solo Lectura</strong>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">
+                        Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información de rutas.
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Mensajes del sistema -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="page-title">
+            <span>🗺️</span>
+            <span>Gestión de Rutas</span>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <select class="filter-select" id="filter-type">
+                    <option value="">Todos los tipos</option>
+                    <option value="TERRESTRE">Terrestre</option>
+                    <option value="AEREO">Aéreo</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar ruta...">
+            <button class="btn" id="new-route-btn">➕ Nueva Ruta</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Rutas</div>
+                <div id="route-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID Ruta</th>
+                        <th>Origen - Destino</th>
+                        <th>Tipo</th>
+                        <th>Distancia</th>
+                        <th>Tiempo Estimado</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="routes-table-body">
+                    <tr>
+                        <td colspan="7" class="loading">Cargando datos de rutas desde la base de datos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Variable global para almacenar las rutas
+        let routesData = [];
+
+        // ✅ FUNCIÓN MEJORADA PARA CARGAR RUTAS REALES
+        async function loadRoutesFromDatabase() {
+            try {
+                showLoadingState();
+                
+                console.log('🔍 Cargando rutas desde la nueva API...');
+                
+                // Usar la nueva API específica
+                const response = await fetch('/api/v1/rutas/', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('📡 Respuesta de la API:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Datos REALES cargados:', data);
+                
+                if (data && data.length > 0) {
+                    routesData = data;
+                    renderRoutesTable(routesData);
+                    showNotification(`${data.length} rutas cargadas correctamente desde la base de datos`, 'success');
+                } else {
+                    showNotification('No hay rutas creadas en la base de datos', 'info');
+                    routesData = [];
+                    renderRoutesTable(routesData);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error al cargar rutas:', error);
+                showErrorState('Error al cargar las rutas: ' + error.message);
+            }
+        }
+
+        // Función para mostrar estado de carga
+        function showLoadingState() {
+            const tableBody = document.getElementById('routes-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading">Cargando datos de rutas desde la base de datos...</td>
+                </tr>
+            `;
+            document.getElementById('route-count').textContent = 'Cargando...';
+        }
+
+        // Función para mostrar estado de error
+        function showErrorState(message) {
+            const tableBody = document.getElementById('routes-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="error">
+                            ${message}
+                            <br>
+                            <button class="btn" onclick="loadRoutesFromDatabase()" style="margin-top: 1rem;">
+                                Reintentar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('route-count').textContent = 'Error';
+        }
+
+        // Función para calcular tiempo estimado
+        function calculateEstimatedTime(distance, transportType) {
+            if (transportType === 'AEREO') {
+                const hours = Math.ceil(distance / 800); // Velocidad promedio 800 km/h
+                return `${hours}h`;
+            } else {
+                const hours = Math.ceil(distance / 80); // Velocidad promedio 80 km/h
+                return `${hours}h`;
+            }
+        }
+
+        // Función para renderizar la tabla de rutas
+        function renderRoutesTable(routes) {
+            const tableBody = document.getElementById('routes-table-body');
+            const routeCount = document.getElementById('route-count');
+            
+            if (routes.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="loading">No se encontraron rutas en la base de datos</td>
+                    </tr>
+                `;
+                routeCount.textContent = 'Total: 0 rutas';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            routeCount.textContent = `Total: ${routes.length} rutas`;
+            
+            routes.forEach(route => {
+                const row = document.createElement('tr');
+                
+                // Tipo de transporte
+                const typeClass = route.tipo_transporte === 'AEREO' ? 'aereo' : 'terrestre';
+                const typeText = route.tipo_transporte === 'AEREO' ? 'Aéreo' : 'Terrestre';
+                const typeIcon = route.tipo_transporte === 'AEREO' ? '✈️' : '🚛';
+                
+                // Estado (siempre activo para rutas)
+                const statusClass = 'activa';
+                const statusText = 'Activa';
+                
+                // Tiempo estimado
+                const estimatedTime = calculateEstimatedTime(route.distancia_km, route.tipo_transporte);
+                
+                row.innerHTML = `
+                    <td>RUT-${route.id}</td>
+                    <td>${route.origen} - ${route.destino}</td>
+                    <td>
+                        <span class="badge ${typeClass}">
+                            ${typeIcon} ${typeText}
+                        </span>
+                    </td>
+                    <td>${route.distancia_km} km</td>
+                    <td>${estimatedTime}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="viewRoute(${route.id})">Ver</button>
+                        {% if user.is_authenticated and user.perfilusuario.tipo_usuario == 'ADMIN' %}
+                        <button class="action-btn" onclick="editRoute(${route.id})">Editar</button>
+                        <button class="action-btn delete" onclick="deleteRoute(${route.id})">Eliminar</button>
+                        {% endif %}
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para filtrar rutas
+        function filterRoutes() {
+            const typeFilter = document.getElementById('filter-type').value;
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            
+            const filteredRoutes = routesData.filter(route => {
+                // Filtro por tipo
+                const matchesType = !typeFilter || route.tipo_transporte === typeFilter;
+                
+                // Filtro por búsqueda
+                const matchesSearch = !searchText || 
+                    route.origen.toLowerCase().includes(searchText) ||
+                    route.destino.toLowerCase().includes(searchText);
+                
+                return matchesType && matchesSearch;
+            });
+            
+            renderRoutesTable(filteredRoutes);
+        }
+
+        // Funciones de acción para las rutas
+        function viewRoute(routeId) {
+            showNotification(`Viendo detalles de la ruta ${routeId}`, 'info');
+            // En una implementación real, redirigiría a la página de detalles
+            // window.location.href = `/rutas/${routeId}/`;
+        }
+
+        function editRoute(routeId) {
+            showNotification(`Editando la ruta ${routeId}`, 'info');
+            window.location.href = `/rutas/${routeId}/editar/`;
+        }
+
+        function deleteRoute(routeId) {
+            if (confirm(`¿Está seguro de que desea eliminar la ruta ${routeId}? Esta acción no se puede deshacer.`)) {
+                showNotification('Eliminando ruta...', 'warning');
+                // En una implementación real, enviaría una solicitud DELETE
+            }
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            
+            let backgroundColor = 'linear-gradient(135deg, #10b981, #059669)';
+            let icon = '✓';
+            
+            if (type === 'error') {
+                backgroundColor = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                icon = '❌';
+            } else if (type === 'warning') {
+                backgroundColor = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                icon = '⚠️';
+            } else if (type === 'info') {
+                backgroundColor = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                icon = 'ℹ️';
+            }
+            
+            notification.innerHTML = `<span style="margin-right: 8px;">${icon}</span>${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${backgroundColor};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 4000);
+        }
+
+        // Inicialización cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRoutesFromDatabase();
+            
+            document.getElementById('filter-type').addEventListener('change', filterRoutes);
+            document.getElementById('search-input').addEventListener('input', filterRoutes);
+            
+            // Configurar botón de nueva ruta solo para admin
+            const newRouteBtn = document.getElementById('new-route-btn');
+            newRouteBtn.addEventListener('click', function() {
+                {% if user.is_authenticated and user.perfilusuario.tipo_usuario == 'ADMIN' %}
+                window.location.href = '{% url 'ruta_create' %}';
+                {% else %}
+                showNotification('Solo los administradores pueden crear nuevas rutas', 'warning');
+                {% endif %}
+            });
+            
+            console.log('🗺️ Módulo de Rutas cargado exitosamente');
+        });
+
+        // Estilos para las animaciones de notificaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Ruta - Logística Global</title>
+    <style>
+        /* MANTENER TODOS LOS ESTILOS ORIGINALES EXACTAMENTE IGUAL */
+        /* Copia todos los estilos CSS del template anterior aquí */
+        
+        .content-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="container">
+        <!-- Mantener el mismo header y nav-menu del template anterior -->
+
+        <div class="page-title">
+            <span>➕</span>
+            <span>Nueva Ruta</span>
+        </div>
+
+        <div class="content-card">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Origen *</label>
+                        <input type="text" class="form-input" name="origen" required placeholder="Ej: Santiago">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Destino *</label>
+                        <input type="text" class="form-input" name="destino" required placeholder="Ej: Valparaíso">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Transporte *</label>
+                        <select class="form-select" name="tipo_transporte" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="TERRESTRE">🚛 Terrestre</option>
+                            <option value="AEREO">✈️ Aéreo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Distancia (km) *</label>
+                        <input type="number" class="form-input" name="distancia_km" required min="0" step="0.1" placeholder="Ej: 120.5">
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-success">Crear Ruta</button>
+                    <a href="{% url 'rutas' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📊</span>
+    <span>Dashboard Principal</span>
+</div>
+
+<!-- Indicador de Permisos -->
+{% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+<div style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success);">
+        <span>👑</span>
+        <div>
+            <strong>Modo Administrador</strong>
+            <div style="font-size: 0.9rem; opacity: 0.9;">
+                Tienes acceso completo al sistema: crear, editar, eliminar y generar reportes.
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+        <span>🔒</span>
+        <div>
+            <strong>Modo Solo Lectura</strong>
+            <div style="font-size: 0.9rem; opacity: 0.9;">
+                Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Estadísticas Principales -->
+<div class="stats-grid">
+    <div class="stat-card" onclick="window.location.href='{% url 'vehiculos' %}'">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">🚛</div>
+        <div>
+            <div class="stat-value">{{ total_vehiculos }}</div>
+            <div class="stat-label">Vehículos Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card" onclick="window.location.href='{% url 'aeronaves' %}'">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--accent), var(--warning));">✈️</div>
+        <div>
+            <div class="stat-value">{{ total_aeronaves }}</div>
+            <div class="stat-label">Aeronaves Activas</div>
+        </div>
+    </div>
+    
+    <div class="stat-card" onclick="window.location.href='{% url 'despachos' %}'">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), #059669);">📦</div>
+        <div>
+            <div class="stat-value">{{ total_despachos }}</div>
+            <div class="stat-label">Total Despachos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card" onclick="window.location.href='{% url 'clientes' %}'">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--info), #1d4ed8);">👥</div>
+        <div>
+            <div class="stat-value">{{ total_clientes }}</div>
+            <div class="stat-label">Clientes Activos</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Columna Principal -->
+    <div>
+        <!-- Últimos Despachos -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3>📦 Últimos Despachos</h3>
+                <a href="{% url 'despachos' %}" class="btn">Ver Todos</a>
+            </div>
+            
+            {% if ultimos_despachos %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">ID</th>
+                            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Cliente</th>
+                            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Ruta</th>
+                            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Estado</th>
+                            <th style="padding: 1rem; text-align: left; color: var(--text-secondary);">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for despacho in ultimos_despachos %}
+                        <tr style="border-bottom: 1px solid var(--border); cursor: pointer;" 
+                            onclick="window.location.href='{% url 'despacho_detail' despacho.pk %}'">
+                            <td style="padding: 1rem;">DESP-{{ despacho.id }}</td>
+                            <td style="padding: 1rem;">{{ despacho.cliente.razon_social }}</td>
+                            <td style="padding: 1rem;">{{ despacho.ruta.origen }} - {{ despacho.ruta.destino }}</td>
+                            <td style="padding: 1rem;">
+                                <span class="badge 
+                                    {% if despacho.estado == 'ENTREGADO' %}active
+                                    {% elif despacho.estado == 'EN_RUTA' %}info
+                                    {% elif despacho.estado == 'PENDIENTE' %}pending
+                                    {% else %}alert{% endif %}">
+                                    {{ despacho.estado }}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem;">{{ despacho.fecha_despacho|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                No hay despachos registrados
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Acciones Rápidas (Solo Admin) -->
+        {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+        <div class="content-card">
+            <div class="card-header">
+                <h3>⚡ Acciones Rápidas</h3>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <button class="btn" onclick="window.location.href='{% url 'despacho_crear' %}'">➕ Nuevo Despacho</button>
+                <button class="btn" onclick="window.location.href='{% url 'vehiculo_crear' %}'">🚛 Nuevo Vehículo</button>
+                <button class="btn" onclick="window.location.href='{% url 'aeronave_crear' %}'">✈️ Nueva Aeronave</button>
+                <button class="btn" onclick="window.location.href='{% url 'generar_reporte_pdf' %}'">📊 Generar Reporte PDF</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Columna Lateral -->
+    <div>
+        <!-- Estado del Sistema -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3>🔍 Estado del Sistema</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: between; align-items: center;">
+                    <span>Vehículos Activos</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 100px; height: 8px; background: var(--border); border-radius: 4px;">
+                            <div style="width: {{ porcentaje_vehiculos_activos }}%; height: 100%; background: var(--success); border-radius: 4px;"></div>
+                        </div>
+                        <span>{{ porcentaje_vehiculos_activos }}%</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: between; align-items: center;">
+                    <span>Aeronaves Activas</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 100px; height: 8px; background: var(--border); border-radius: 4px;">
+                            <div style="width: {{ porcentaje_aeronaves_activas }}%; height: 100%; background: var(--accent); border-radius: 4px;"></div>
+                        </div>
+                        <span>{{ porcentaje_aeronaves_activas }}%</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: between; align-items: center;">
+                    <span>Personal Activo</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 100px; height: 8px; background: var(--border); border-radius: 4px;">
+                            <div style="width: {{ porcentaje_personal_activo }}%; height: 100%; background: var(--info); border-radius: 4px;"></div>
+                        </div>
+                        <span>{{ porcentaje_personal_activo }}%</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: between; align-items: center;">
+                    <span>Seguros Vigentes</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 100px; height: 8px; background: var(--border); border-radius: 4px;">
+                            <div style="width: {{ porcentaje_seguros_vigentes }}%; height: 100%; background: var(--primary); border-radius: 4px;"></div>
+                        </div>
+                        <span>{{ porcentaje_seguros_vigentes }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seguros Próximos a Vencer (Solo Admin) -->
+        {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+        <div class="content-card">
+            <div class="card-header">
+                <h3>🛡️ Seguros Recientes</h3>
+                <a href="{% url 'seguros' %}" class="btn">Ver Todos</a>
+            </div>
+            
+            {% if seguros_recientes %}
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for seguro in seguros_recientes %}
+                <div style="padding: 1rem; background: rgba(51, 65, 85, 0.3); border-radius: 8px; border-left: 4px solid var(--info);">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">{{ seguro.numero_poliza }}</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        {{ seguro.aseguradora }} - Vence: {{ seguro.vigencia_hasta|date:"d/m/Y" }}
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <span class="badge {% if seguro.estado == 'VIGENTE' %}active{% else %}warning{% endif %}">
+                            {{ seguro.estado }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 1rem; color: var(--text-secondary);">
+                No hay seguros registrados
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Función para actualizar el dashboard cada 30 segundos
+function actualizarDashboard() {
+    console.log('Actualizando datos del dashboard...');
+    // En una implementación real, aquí harías una llamada AJAX
+}
+
+// Actualizar cada 30 segundos
+setInterval(actualizarDashboard, 30000);
+
+console.log('📊 Dashboard cargado exitosamente');
+</script>
+{% endblock %}

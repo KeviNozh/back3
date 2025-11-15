@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API - Sistema de Gestión de Transporte</title>
+    <style>
+        /* Todos los estilos del dashboard original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .api-status-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .endpoints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .endpoint-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .method-get {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .method-post {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .method-put {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .method-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .endpoint-path {
+            font-family: monospace;
+            background: rgba(51, 65, 85, 0.5);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .api-keys-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .badge.alert {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .badge.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .status-grid, .endpoints-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .api-keys-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🚚</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                <div>
+                    <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        {% if user.is_staff %}Administrador{% else %}Usuario{% endif %}
+                    </div>
+                </div>
+                <div class="avatar" onclick="window.location.href='{% url 'logout' %}'" title="Cerrar sesión">
+                    {{ user.username|slice:":2"|upper }}
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='despachos.html'">📦 Despachos</div>
+            <div class="nav-item" onclick="window.location.href='rutas.html'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='vehiculos.html'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='aeronaves.html'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='conductores.html'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='pilotos.html'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='clientes.html'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='cargas.html'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='seguros.html'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='reportes.html'">📈 Reportes</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <div class="page-title">
+            <span>🔗</span>
+            <span>API REST - Documentación</span>
+        </div>
+
+        <div class="api-status-card">
+            <div class="status-header">
+                <div class="status-title">Estado del Servicio API</div>
+                <div class="status-badge">🟢 Operativo</div>
+            </div>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-value">99.8%</div>
+                    <div class="status-label">Disponibilidad</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">45 ms</div>
+                    <div class="status-label">Tiempo Respuesta</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">1,245</div>
+                    <div class="status-label">Llamadas Hoy</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">0</div>
+                    <div class="status-label">Errores</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn" onclick="testAPI()">🧪 Probar API</button>
+                <button class="btn btn-secondary" onclick="showDocumentation()">📚 Ver Documentación Completa</button>
+            </div>
+        </div>
+
+        <div class="endpoints-grid">
+            <div class="endpoint-card">
+                <div class="endpoint-method method-get">GET</div>
+                <div class="endpoint-path">/api/despachos/</div>
+                <div class="endpoint-description">
+                    Obtener lista de despachos con filtros opcionales por estado, fecha y cliente.
+                </div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-method method-post">POST</div>
+                <div class="endpoint-path">/api/despachos/</div>
+                <div class="endpoint-description">
+                    Crear un nuevo despacho. Requiere autenticación JWT y datos completos del despacho.
+                </div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-method method-get">GET</div>
+                <div class="endpoint-path">/api/despachos/{id}/</div>
+                <div class="endpoint-description">
+                    Obtener detalles específicos de un despacho por ID.
+                </div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-method method-put">PUT</div>
+                <div class="endpoint-path">/api/despachos/{id}/</div>
+                <div class="endpoint-description">
+                    Actualizar un despacho existente. Campos parciales permitidos.
+                </div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-method method-get">GET</div>
+                <div class="endpoint-path">/api/vehiculos/</div>
+                <div class="endpoint-description">
+                    Listar vehículos con información de estado, ubicación y mantenimiento.
+                </div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-method method-get">GET</div>
+                <div class="endpoint-path">/api/aeronaves/</div>
+                <div class="endpoint-description">
+                    Obtener información de aeronaves, horarios de vuelo y estado operativo.
+                </div>
+            </div>
+        </div>
+
+        <div class="api-keys-container">
+            <div class="table-header">
+                <div class="table-title">Claves API</div>
+                <button class="btn" onclick="generateAPIKey()">➕ Generar Nueva Clave</button>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Clave API</th>
+                        <th>Creado</th>
+                        <th>Último Uso</th>
+                        <th>Llamadas (30d)</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Aplicación Web</td>
+                        <td>lg_web_*****7890</td>
+                        <td>15/01/2023</td>
+                        <td>10/12/2023</td>
+                        <td>12,458</td>
+                        <td><span class="badge active">Activa</span></td>
+                        <td>
+                            <button class="action-btn" onclick="viewAPIKey('lg_web_*****7890')">Ver</button>
+                            <button class="action-btn" onclick="revokeAPIKey('lg_web_*****7890')">Revocar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>App Móvil</td>
+                        <td>lg_mobile_*****1234</td>
+                        <td>20/02/2023</td>
+                        <td>09/12/2023</td>
+                        <td>8,742</td>
+                        <td><span class="badge active">Activa</span></td>
+                        <td>
+                            <button class="action-btn" onclick="viewAPIKey('lg_mobile_*****1234')">Ver</button>
+                            <button class="action-btn" onclick="revokeAPIKey('lg_mobile_*****1234')">Revocar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Integración Cliente</td>
+                        <td>lg_client_*****5678</td>
+                        <td>05/06/2023</td>
+                        <td>05/12/2023</td>
+                        <td>3,215</td>
+                        <td><span class="badge warning">Inactiva</span></td>
+                        <td>
+                            <button class="action-btn" onclick="viewAPIKey('lg_client_*****5678')">Ver</button>
+                            <button class="action-btn" onclick="revokeAPIKey('lg_client_*****5678')">Revocar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Desarrollo</td>
+                        <td>lg_dev_*****9012</td>
+                        <td>10/11/2023</td>
+                        <td>08/12/2023</td>
+                        <td>1,847</td>
+                        <td><span class="badge active">Activa</span></td>
+                        <td>
+                            <button class="action-btn" onclick="viewAPIKey('lg_dev_*****9012')">Ver</button>
+                            <button class="action-btn" onclick="revokeAPIKey('lg_dev_*****9012')">Revocar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function testAPI() {
+            showNotification('Probando conexión API...');
+            // Simulate API test
+            setTimeout(() => {
+                showNotification('✓ Conexión API exitosa - JWT activo');
+            }, 1500);
+        }
+
+        function showDocumentation() {
+            showNotification('Abriendo documentación completa de la API...');
+            // In a real application, this would open the full API documentation
+        }
+
+        function generateAPIKey() {
+            showNotification('Generando nueva clave API...');
+            // In a real application, this would generate a new API key
+            setTimeout(() => {
+                showNotification('✓ Nueva clave API generada exitosamente');
+            }, 2000);
+        }
+
+        function viewAPIKey(keyId) {
+            showNotification(`Mostrando detalles de clave API: ${keyId}`);
+            // In a real application, this would show the API key details
+        }
+
+        function revokeAPIKey(keyId) {
+            if (confirm(`¿Está seguro de que desea revocar la clave API ${keyId}?`)) {
+                showNotification(`Revocando clave API: ${keyId}`);
+                // In a real application, this would revoke the API key
+                setTimeout(() => {
+                    showNotification('✓ Clave API revocada exitosamente');
+                }, 2000);
+            }
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = `✓ ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #6366f1, #06b6d4);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('🔗 Módulo de API cargado exitosamente');
+        console.log('📊 Sistema integrado con Django REST Framework');
+        console.log('🔐 Autenticación JWT activa');
+        console.log('🚀 API REST operativa');
+    </script>
+</body>
+</html>

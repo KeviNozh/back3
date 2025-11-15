@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Seguro - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🛡️</span>
+    <span>Editar Seguro</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Número de Póliza</label>
+                <input type="text" class="form-input" name="numero_poliza" value="{{ seguro.numero_poliza }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo de Seguro</label>
+                <input type="text" class="form-input" name="tipo_seguro" value="{{ seguro.tipo_seguro }}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Aseguradora</label>
+                <input type="text" class="form-input" name="aseguradora" value="{{ seguro.aseguradora }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cobertura</label>
+                <input type="number" class="form-input" name="cobertura" value="{{ seguro.cobertura }}" step="0.01" required min="0">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Vigencia Desde</label>
+                <input type="date" class="form-input" name="vigencia_desde" value="{{ seguro.vigencia_desde|date:'Y-m-d' }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Vigencia Hasta</label>
+                <input type="date" class="form-input" name="vigencia_hasta" value="{{ seguro.vigencia_hasta|date:'Y-m-d' }}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Vehículo</label>
+                <select class="form-select" name="vehiculo">
+                    <option value="">No aplica</option>
+                    {% for vehiculo in vehiculos %}
+                    <option value="{{ vehiculo.id }}" {% if seguro.vehiculo and seguro.vehiculo.id == vehiculo.id %}selected{% endif %}>
+                        {{ vehiculo.patente }} - {{ vehiculo.modelo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Aeronave</label>
+                <select class="form-select" name="aeronave">
+                    <option value="">No aplica</option>
+                    {% for aeronave in aeronaves %}
+                    <option value="{{ aeronave.id }}" {% if seguro.aeronave and seguro.aeronave.id == aeronave.id %}selected{% endif %}>
+                        {{ aeronave.matricula }} - {{ aeronave.modelo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Estado</label>
+            <select class="form-select" name="estado" required>
+                <option value="Vigente" {% if seguro.estado == 'Vigente' %}selected{% endif %}>Vigente</option>
+                <option value="Vencido" {% if seguro.estado == 'Vencido' %}selected{% endif %}>Vencido</option>
+                <option value="Cancelado" {% if seguro.estado == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                <option value="En Proceso" {% if seguro.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+            </select>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Seguro</button>
+            <a href="{% url 'seguros' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

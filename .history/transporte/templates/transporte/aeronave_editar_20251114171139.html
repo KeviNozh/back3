@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Aeronave - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>✈️</span>
+    <span>Editar Aeronave</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Matrícula</label>
+                <input type="text" class="form-input" name="matricula" value="{{ aeronave.matricula }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo de Aeronave</label>
+                <input type="text" class="form-input" name="tipo_aeronave" value="{{ aeronave.tipo_aeronave }}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Modelo</label>
+                <input type="text" class="form-input" name="modelo" value="{{ aeronave.modelo }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Capacidad (kg)</label>
+                <input type="number" class="form-input" name="capacidad_kg" value="{{ aeronave.capacidad_kg }}" required min="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Piloto Asignado</label>
+            <select class="form-select" name="piloto_asignado">
+                <option value="">Sin asignar</option>
+                {% for piloto in pilotos %}
+                <option value="{{ piloto.id }}" {% if aeronave.piloto_asignado and aeronave.piloto_asignado.id == piloto.id %}selected{% endif %}>
+                    {{ piloto.nombre }} ({{ piloto.certificacion }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" {% if aeronave.activo %}checked{% endif %}> Activa
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Aeronave</button>
+            <a href="{% url 'aeronaves' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

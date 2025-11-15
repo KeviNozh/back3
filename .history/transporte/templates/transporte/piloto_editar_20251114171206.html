@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Piloto - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👨‍✈️</span>
+    <span>Editar Piloto</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-input" name="nombre" value="{{ piloto.nombre }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">RUT</label>
+                <input type="text" class="form-input" name="rut" value="{{ piloto.rut }}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Certificación</label>
+                <input type="text" class="form-input" name="certificacion" value="{{ piloto.certificacion }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input type="tel" class="form-input" name="telefono" value="{{ piloto.telefono }}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" name="email" value="{{ piloto.email }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Horas de Vuelo</label>
+                <input type="number" class="form-input" name="horas_vuelo" value="{{ piloto.horas_vuelo }}" min="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" {% if piloto.activo %}checked{% endif %}> Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Piloto</button>
+            <a href="{% url 'pilotos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

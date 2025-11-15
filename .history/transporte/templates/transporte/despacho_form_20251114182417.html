@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if despacho %}Editar{% else %}Nuevo{% endif %} Despacho - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📦</span>
+    <span>{% if despacho %}Editar Despacho{% else %}Nuevo Despacho{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Sección 1: Información Básica -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>👥</span>
+                <span>Información del Cliente y Carga</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Cliente *</label>
+                    <select class="form-select" name="cliente" required>
+                        <option value="">Seleccionar cliente</option>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" {% if despacho.cliente.id == cliente.id %}selected{% endif %}>
+                            {{ cliente.razon_social|default:cliente.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Carga *</label>
+                    <select class="form-select" name="carga" required>
+                        <option value="">Seleccionar carga</option>
+                        {% for carga in cargas %}
+                        <option value="{{ carga.id }}" {% if despacho.carga.id == carga.id %}selected{% endif %}>
+                            {{ carga.descripcion }} - {{ carga.peso_kg }}kg
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 2: Ruta y Estado -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🗺️</span>
+                <span>Ruta y Transporte</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Ruta *</label>
+                    <select class="form-select" name="ruta" required>
+                        <option value="">Seleccionar ruta</option>
+                        {% for ruta in rutas %}
+                        <option value="{{ ruta.id }}" {% if despacho.ruta.id == ruta.id %}selected{% endif %}>
+                            {{ ruta.origen }} - {{ ruta.destino }} ({{ ruta.tipo_transporte }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estado *</label>
+                    <select class="form-select" name="estado" required>
+                        <option value="PENDIENTE" {% if despacho.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                        <option value="EN_RUTA" {% if despacho.estado == 'EN_RUTA' %}selected{% endif %}>En Ruta</option>
+                        <option value="ENTREGADO" {% if despacho.estado == 'ENTREGADO' %}selected{% endif %}>Entregado</option>
+                        <option value="CANCELADO" {% if despacho.estado == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 3: Costos -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>💰</span>
+                <span>Información de Costos</span>
+            </h3>
+            <div style="max-width: 300px;">
+                <div class="form-group">
+                    <label class="form-label">Costo de Envío ($) *</label>
+                    <input type="number" class="form-input" name="costo_envio" 
+                           value="{{ despacho.costo_envio|default:'' }}" step="0.01" min="0" 
+                           placeholder="0.00" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 4: Recursos (Opcional) -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🚚</span>
+                <span>Asignación de Recursos (Opcional)</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Vehículo</label>
+                    <select class="form-select" name="vehiculo">
+                        <option value="">Sin asignar</option>
+                        {% for vehiculo in vehiculos %}
+                        <option value="{{ vehiculo.id }}" {% if despacho.vehiculo.id == vehiculo.id %}selected{% endif %}>
+                            {{ vehiculo.patente }} - {{ vehiculo.modelo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Aeronave</label>
+                    <select class="form-select" name="aeronave">
+                        <option value="">Sin asignar</option>
+                        {% for aeronave in aeronaves %}
+                        <option value="{{ aeronave.id }}" {% if despacho.aeronave.id == aeronave.id %}selected{% endif %}>
+                            {{ aeronave.matricula }} - {{ aeronave.modelo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Conductor</label>
+                    <select class="form-select" name="conductor">
+                        <option value="">Sin asignar</option>
+                        {% for conductor in conductores %}
+                        <option value="{{ conductor.id }}" {% if despacho.conductor.id == conductor.id %}selected{% endif %}>
+                            {{ conductor.nombre }} ({{ conductor.licencia }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Piloto</label>
+                    <select class="form-select" name="piloto">
+                        <option value="">Sin asignar</option>
+                        {% for piloto in pilotos %}
+                        <option value="{{ piloto.id }}" {% if despacho.piloto.id == piloto.id %}selected{% endif %}>
+                            {{ piloto.nombre }} ({{ piloto.certificacion }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">
+                {% if despacho %}Actualizar{% else %}Crear{% endif %} Despacho
+            </button>
+            <a href="{% url 'despachos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .content-card > div > div {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

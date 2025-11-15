@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguros - Sistema de Gestión de Transporte</title>
+    <style>
+        /* Todos los estilos del dashboard original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.vigente {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.por_vencer {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .badge.vencido {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.vehiculo {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.aeronave {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .badge.carga {
+            background: rgba(14, 165, 233, 0.2);
+            color: #38bdf8;
+        }
+
+        .badge.responsabilidad {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.6rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select, .search-input {
+                min-width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 800px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🚚</div>
+                <span>Logística Global</span>
+            </div>
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                <div>
+                    <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        {% if user.is_staff %}Administrador{% else %}Usuario{% endif %}
+                    </div>
+                </div>
+                <div class="avatar" onclick="window.location.href='{% url 'logout' %}'" title="Cerrar sesión">
+                    {{ user.username|slice:":2"|upper }}
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <div class="page-title">
+            <span>🛡️</span>
+            <span>Gestión de Seguros</span>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <select class="filter-select" id="filter-status">
+                    <option value="">Todos los estados</option>
+                    <option value="vigente">Vigente</option>
+                    <option value="por_vencer">Por Vencer</option>
+                    <option value="vencido">Vencido</option>
+                </select>
+                <select class="filter-select" id="filter-type">
+                    <option value="">Todos los tipos</option>
+                    <option value="vehiculo">Vehículo</option>
+                    <option value="aeronave">Aeronave</option>
+                    <option value="carga">Carga</option>
+                    <option value="responsabilidad">Responsabilidad Civil</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar seguro...">
+            <button class="btn" id="new-insurance-btn">➕ Nuevo Seguro</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Seguros</div>
+                <div id="insurance-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Póliza</th>
+                        <th>Asegurado</th>
+                        <th>Tipo</th>
+                        <th>Aseguradora</th>
+                        <th>Cobertura</th>
+                        <th>Vigencia Desde</th>
+                        <th>Vigencia Hasta</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="insurances-table-body">
+                    <tr>
+                        <td colspan="9" class="loading">Cargando datos de seguros desde la base de datos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="newSeguroModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('newSeguroModal')">&times;</span>
+            <h3>Nuevo Seguro</h3>
+            <form id="newSeguroForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Número de Póliza</label>
+                    <input type="text" class="form-input" id="numero_poliza" name="numero_poliza" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Seguro</label>
+                        <select class="form-select" id="tipo_seguro" name="tipo_seguro" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Vehículo">Vehículo</option>
+                            <option value="Aeronave">Aeronave</option>
+                            <option value="Carga">Carga</option>
+                            <option value="Responsabilidad Civil">Responsabilidad Civil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Aseguradora</label>
+                        <input type="text" class="form-input" id="aseguradora" name="aseguradora" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Cobertura ($)</label>
+                        <input type="number" class="form-input" id="cobertura" name="cobertura" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select class="form-select" id="estado" name="estado" required>
+                            <option value="Vigente">Vigente</option>
+                            <option value="Vencido">Vencido</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Vigencia Desde</label>
+                        <input type="date" class="form-input" id="vigencia_desde" name="vigencia_desde" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Vigencia Hasta</label>
+                        <input type="date" class="form-input" id="vigencia_hasta" name="vigencia_hasta" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Vehículo Asociado</label>
+                        <select class="form-select" id="vehiculo" name="vehiculo">
+                            <option value="">Sin vehículo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Aeronave Asociada</label>
+                        <select class="form-select" id="aeronave" name="aeronave">
+                            <option value="">Sin aeronave</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newSeguroModal')">Cancelar</button>
+                    <button type="submit" class="btn">Crear Seguro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewSeguroModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('viewSeguroModal')">&times;</span>
+            <h3 id="viewSeguroTitle">Detalles del Seguro</h3>
+            <div id="viewSeguroContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variable global para almacenar los seguros
+        let insurancesData = [];
+        let vehiculosData = [];
+        let aeronavesData = [];
+
+        // Función para cargar seguros desde la base de datos
+        async function loadInsurancesFromDatabase() {
+            try {
+                showLoadingState();
+                
+                const response = await fetch('/api/seguros/');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar los seguros');
+                }
+                
+                insurancesData = await response.json();
+                renderInsurancesTable(insurancesData);
+                showNotification('Datos de seguros cargados correctamente');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorState('Error al cargar los seguros: ' + error.message);
+            }
+        }
+
+        // Función para cargar vehículos y aeronaves
+        async function loadAssetsForInsurance() {
+            try {
+                // Cargar vehículos
+                const vehiculosResponse = await fetch('/api/vehiculos/');
+                if (vehiculosResponse.ok) {
+                    vehiculosData = await vehiculosResponse.json();
+                    populateVehiculosSelect();
+                }
+
+                // Cargar aeronaves
+                const aeronavesResponse = await fetch('/api/aeronaves/');
+                if (aeronavesResponse.ok) {
+                    aeronavesData = await aeronavesResponse.json();
+                    populateAeronavesSelect();
+                }
+            } catch (error) {
+                console.error('Error cargando activos:', error);
+            }
+        }
+
+        // Función para poblar select de vehículos
+        function populateVehiculosSelect() {
+            const vehiculoSelect = document.getElementById('vehiculo');
+            vehiculoSelect.innerHTML = '<option value="">Sin vehículo</option>';
+            
+            vehiculosData.forEach(vehiculo => {
+                const option = document.createElement('option');
+                option.value = vehiculo.id;
+                option.textContent = `${vehiculo.patente} - ${vehiculo.modelo}`;
+                vehiculoSelect.appendChild(option);
+            });
+        }
+
+        // Función para poblar select de aeronaves
+        function populateAeronavesSelect() {
+            const aeronaveSelect = document.getElementById('aeronave');
+            aeronaveSelect.innerHTML = '<option value="">Sin aeronave</option>';
+            
+            aeronavesData.forEach(aeronave => {
+                const option = document.createElement('option');
+                option.value = aeronave.id;
+                option.textContent = `${aeronave.matricula} - ${aeronave.modelo}`;
+                aeronaveSelect.appendChild(option);
+            });
+        }
+
+        // Función para mostrar estado de carga
+        function showLoadingState() {
+            const tableBody = document.getElementById('insurances-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="loading">Cargando datos de seguros desde la base de datos...</td>
+                </tr>
+            `;
+            document.getElementById('insurance-count').textContent = 'Cargando...';
+        }
+
+        // Función para mostrar estado de error
+        function showErrorState(message) {
+            const tableBody = document.getElementById('insurances-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9">
+                        <div class="error">
+                            ${message}
+                            <br>
+                            <button class="btn" onclick="loadInsurancesFromDatabase()" style="margin-top: 1rem;">
+                                Reintentar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('insurance-count').textContent = 'Error';
+        }
+
+        // Función para formatear fecha
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        // Función para formatear moneda
+        function formatCurrency(amount) {
+            if (!amount) return 'N/A';
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP'
+            }).format(amount);
+        }
+
+        // Función para determinar el estado del seguro basado en fechas
+        function getInsuranceStatus(vigenciaHasta, estado) {
+            // Si el estado está definido en la base de datos, usarlo
+            if (estado && estado !== 'Vigente') {
+                return estado.toLowerCase();
+            }
+            
+            if (!vigenciaHasta) return 'vencido';
+            
+            const hoy = new Date();
+            const vencimiento = new Date(vigenciaHasta);
+            const diasRestantes = Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+            
+            if (diasRestantes < 0) return 'vencido';
+            if (diasRestantes <= 30) return 'por_vencer';
+            return 'vigente';
+        }
+
+        // Función para obtener nombre del asegurado
+        function getAseguradoName(seguro) {
+            if (seguro.vehiculo) {
+                return seguro.vehiculo.patente || 'Vehículo';
+            } else if (seguro.aeronave) {
+                return seguro.aeronave.matricula || 'Aeronave';
+            } else {
+                return 'N/A';
+            }
+        }
+
+        // Función para obtener tipo de seguro
+        function getInsuranceType(seguro) {
+            if (seguro.vehiculo) return 'vehiculo';
+            if (seguro.aeronave) return 'aeronave';
+            return seguro.tipo_seguro?.toLowerCase() || 'vehiculo';
+        }
+
+        // Función para renderizar la tabla de seguros
+        function renderInsurancesTable(insurances) {
+            const tableBody = document.getElementById('insurances-table-body');
+            const insuranceCount = document.getElementById('insurance-count');
+            
+            if (insurances.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="loading">No se encontraron seguros en la base de datos</td>
+                    </tr>
+                `;
+                insuranceCount.textContent = 'Total: 0 seguros';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            insuranceCount.textContent = `Total: ${insurances.length} seguros`;
+            
+            insurances.forEach(insurance => {
+                const row = document.createElement('tr');
+                
+                // Determinar el estado del seguro
+                const status = getInsuranceStatus(insurance.vigencia_hasta, insurance.estado);
+                let statusClass = '';
+                let statusText = '';
+                
+                switch (status) {
+                    case 'vigente':
+                        statusClass = 'vigente';
+                        statusText = 'Vigente';
+                        break;
+                    case 'por_vencer':
+                        statusClass = 'por_vencer';
+                        statusText = 'Por Vencer';
+                        break;
+                    case 'vencido':
+                        statusClass = 'vencido';
+                        statusText = 'Vencido';
+                        break;
+                    case 'cancelado':
+                        statusClass = 'vencido';
+                        statusText = 'Cancelado';
+                        break;
+                    default:
+                        statusClass = 'vencido';
+                        statusText = 'Vencido';
+                }
+
+                // Determinar la clase del badge según el tipo
+                const insuranceType = getInsuranceType(insurance);
+                let typeClass = '';
+                let typeText = '';
+                
+                switch (insuranceType) {
+                    case 'vehiculo':
+                        typeClass = 'vehiculo';
+                        typeText = 'Vehículo';
+                        break;
+                    case 'aeronave':
+                        typeClass = 'aeronave';
+                        typeText = 'Aeronave';
+                        break;
+                    case 'carga':
+                        typeClass = 'carga';
+                        typeText = 'Carga';
+                        break;
+                    case 'responsabilidad civil':
+                        typeClass = 'responsabilidad';
+                        typeText = 'Responsabilidad';
+                        break;
+                    default:
+                        typeClass = 'vehiculo';
+                        typeText = insurance.tipo_seguro || 'Vehículo';
+                }
+                
+                const aseguradoName = getAseguradoName(insurance);
+                
+                row.innerHTML = `
+                    <td>${insurance.numero_poliza || 'N/A'}</td>
+                    <td>${aseguradoName}</td>
+                    <td><span class="badge ${typeClass}">${typeText}</span></td>
+                    <td>${insurance.aseguradora || 'N/A'}</td>
+                    <td>${formatCurrency(insurance.cobertura)}</td>
+                    <td>${formatDate(insurance.vigencia_desde)}</td>
+                    <td>${formatDate(insurance.vigencia_hasta)}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="viewInsurance(${insurance.id})">Ver</button>
+                        <button class="action-btn" onclick="editInsurance(${insurance.id})">Editar</button>
+                        <button class="action-btn delete" onclick="deleteInsurance(${insurance.id})">Eliminar</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para crear un nuevo seguro
+        async function createInsurance(insuranceData) {
+            try {
+                const response = await fetch('/api/seguros/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify(insuranceData)
+                });
+                
+                if (response.ok) {
+                    const newInsurance = await response.json();
+                    return newInsurance;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al crear el seguro');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            }
+        }
+
+        // Función para filtrar seguros
+        function filterInsurances() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            
+            const filteredInsurances = insurancesData.filter(insurance => {
+                // Determinar el estado actual del seguro
+                const currentStatus = getInsuranceStatus(insurance.vigencia_hasta, insurance.estado);
+                const matchesStatus = !statusFilter || currentStatus === statusFilter;
+                
+                const insuranceType = getInsuranceType(insurance);
+                const matchesType = !typeFilter || insuranceType === typeFilter;
+                
+                const matchesSearch = !searchText || 
+                    (insurance.numero_poliza && insurance.numero_poliza.toLowerCase().includes(searchText)) ||
+                    (insurance.aseguradora && insurance.aseguradora.toLowerCase().includes(searchText)) ||
+                    (getAseguradoName(insurance).toLowerCase().includes(searchText));
+                
+                return matchesStatus && matchesType && matchesSearch;
+            });
+            
+            renderInsurancesTable(filteredInsurances);
+        }
+
+        // Funciones de acción para los seguros
+        async function viewInsurance(insuranceId) {
+            try {
+                const response = await fetch(`/api/seguros/${insuranceId}/`);
+                const insuranceDetails = await response.json();
+                
+                showNotification(`Viendo detalles del seguro ${insuranceId}`);
+                
+                document.getElementById('viewSeguroTitle').textContent = `Detalles del Seguro #${insuranceId}`;
+                document.getElementById('viewSeguroContent').innerHTML = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div><strong>Número de Póliza:</strong> ${insuranceDetails.numero_poliza || 'N/A'}</div>
+                        <div><strong>Tipo de Seguro:</strong> ${insuranceDetails.tipo_seguro || 'N/A'}</div>
+                        <div><strong>Aseguradora:</strong> ${insuranceDetails.aseguradora || 'N/A'}</div>
+                        <div><strong>Cobertura:</strong> ${formatCurrency(insuranceDetails.cobertura)}</div>
+                        <div><strong>Vigencia Desde:</strong> ${formatDate(insuranceDetails.vigencia_desde)}</div>
+                        <div><strong>Vigencia Hasta:</strong> ${formatDate(insuranceDetails.vigencia_hasta)}</div>
+                        <div><strong>Estado:</strong> ${insuranceDetails.estado || 'N/A'}</div>
+                        <div><strong>Asegurado:</strong> ${getAseguradoName(insuranceDetails)}</div>
+                    </div>
+                `;
+                showModal('viewSeguroModal');
+                
+            } catch (error) {
+                console.error('Error al obtener detalles:', error);
+                showNotification('Error al cargar detalles del seguro', 'error');
+            }
+        }
+
+        async function editInsurance(insuranceId) {
+            showNotification(`Editando el seguro ${insuranceId}`);
+            indow.location.href = `/seguros/${vehiculoId}/editar/`;;
+        }
+
+        async function deleteInsurance(insuranceId) {
+            if (confirm(`¿Está seguro de que desea eliminar el seguro ${insuranceId}?`)) {
+                try {
+                    const response = await fetch(`/api/seguros/${insuranceId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        await loadInsurancesFromDatabase();
+                        showNotification(`Seguro ${insuranceId} eliminado correctamente`);
+                    } else {
+                        throw new Error('Error al eliminar el seguro');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar el seguro', 'error');
+                }
+            }
+        }
+
+        // Función auxiliar para obtener el token CSRF
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Modal Functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Limpiar formulario al cerrar
+            if (modalId === 'newSeguroModal') {
+                document.getElementById('newSeguroForm').reset();
+            }
+        }
+
+        function showNewSeguroModal() {
+            showModal('newSeguroModal');
+        }
+
+        // Notification System
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.textContent = type === 'success' ? `✓ ${message}` : `✗ ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #6366f1, #06b6d4)' : 'linear-gradient(135deg, #ef4444, #dc2626)'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Inicialización cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInsurancesFromDatabase();
+            loadAssetsForInsurance();
+            
+            document.getElementById('filter-status').addEventListener('change', filterInsurances);
+            document.getElementById('filter-type').addEventListener('change', filterInsurances);
+            document.getElementById('search-input').addEventListener('input', filterInsurances);
+            
+            document.getElementById('new-insurance-btn').addEventListener('click', showNewSeguroModal);
+            
+            // Configurar formulario de nuevo seguro
+            document.getElementById('newSeguroForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    // Recoger datos del formulario
+                    const insuranceData = {
+                        numero_poliza: document.getElementById('numero_poliza').value,
+                        tipo_seguro: document.getElementById('tipo_seguro').value,
+                        aseguradora: document.getElementById('aseguradora').value,
+                        cobertura: parseFloat(document.getElementById('cobertura').value),
+                        estado: document.getElementById('estado').value,
+                        vigencia_desde: document.getElementById('vigencia_desde').value,
+                        vigencia_hasta: document.getElementById('vigencia_hasta').value,
+                    };
+
+                    // Agregar vehículo o aeronave si están seleccionados
+                    const vehiculoId = document.getElementById('vehiculo').value;
+                    const aeronaveId = document.getElementById('aeronave').value;
+                    
+                    if (vehiculoId) {
+                        insuranceData.vehiculo = parseInt(vehiculoId);
+                    }
+                    if (aeronaveId) {
+                        insuranceData.aeronave = parseInt(aeronaveId);
+                    }
+                    
+                    // Crear seguro en la base de datos
+                    const newInsurance = await createInsurance(insuranceData);
+                    
+                    // Cerrar modal y mostrar mensaje
+                    closeModal('newSeguroModal');
+                    showNotification('Seguro creado exitosamente');
+                    
+                    // Recargar la tabla
+                    await loadInsurancesFromDatabase();
+                    
+                } catch (error) {
+                    console.error('Error al crear seguro:', error);
+                    showNotification('Error al crear el seguro: ' + error.message, 'error');
+                }
+            });
+            
+            console.log('🛡️ Módulo de Seguros cargado exitosamente');
+        });
+
+        // Estilos para las animaciones de notificaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    // Limpiar formulario al cerrar
+                    if (modal.id === 'newSeguroModal') {
+                        document.getElementById('newSeguroForm').reset();
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

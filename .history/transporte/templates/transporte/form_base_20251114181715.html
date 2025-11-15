@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-title">
+    <span>{{ icon }}</span>
+    <span>{{ title }}</span>
+</div>
+
+<div class="form-container">
+    <div class="form-section">
+        {% if description %}
+        <div style="margin-bottom: 2rem; color: var(--text-secondary);">
+            {{ description }}
+        </div>
+        {% endif %}
+        
+        <form method="post" id="mainForm">
+            {% csrf_token %}
+            
+            {% for section in form_sections %}
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>{{ section.icon }}</span>
+                    <span>{{ section.title }}</span>
+                </div>
+                
+                <div class="form-grid">
+                    {% for field in section.fields %}
+                    <div class="form-group">
+                        <label class="form-label" for="id_{{ field.name }}">
+                            {{ field.label }}
+                            {% if field.required %}<span style="color: var(--danger);">*</span>{% endif %}
+                        </label>
+                        
+                        {% if field.type == 'select' %}
+                        <select class="form-select" name="{{ field.name }}" id="id_{{ field.name }}" {% if field.required %}required{% endif %}>
+                            <option value="">Seleccionar {{ field.label|lower }}</option>
+                            {% for option in field.options %}
+                            <option value="{{ option.value }}" {% if field.value == option.value %}selected{% endif %}>
+                                {{ option.text }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        
+                        {% elif field.type == 'textarea' %}
+                        <textarea class="form-textarea" name="{{ field.name }}" id="id_{{ field.name }}" 
+                                  {% if field.required %}required{% endif %} 
+                                  placeholder="{{ field.placeholder }}">{{ field.value|default:'' }}</textarea>
+                        
+                        {% elif field.type == 'checkbox' %}
+                        <div class="form-checkbox">
+                            <input type="checkbox" name="{{ field.name }}" id="id_{{ field.name }}" 
+                                   {% if field.value %}checked{% endif %}>
+                            <label for="id_{{ field.name }}">{{ field.label }}</label>
+                        </div>
+                        
+                        {% else %}
+                        <input type="{{ field.type }}" class="form-input" name="{{ field.name }}" 
+                               id="id_{{ field.name }}" value="{{ field.value|default:'' }}" 
+                               {% if field.required %}required{% endif %} 
+                               placeholder="{{ field.placeholder }}"
+                               {% if field.step %}step="{{ field.step }}"{% endif %}
+                               {% if field.min %}min="{{ field.min }}"{% endif %}>
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                        <div class="form-help" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            {{ field.help_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">
+                    <span>{{ submit_icon }}</span>
+                    <span>{{ submit_text }}</span>
+                </button>
+                <a href="{{ cancel_url }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('mainForm');
+    
+    // Validación básica del formulario
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('error');
+                
+                // Crear mensaje de error si no existe
+                if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('form-error')) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'form-error';
+                    errorDiv.textContent = 'Este campo es obligatorio';
+                    field.parentNode.appendChild(errorDiv);
+                }
+            } else {
+                field.classList.remove('error');
+                const errorDiv = field.nextElementSibling;
+                if (errorDiv && errorDiv.classList.contains('form-error')) {
+                    errorDiv.remove();
+                }
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            showNotification('Por favor, complete todos los campos obligatorios', 'error');
+        }
+    });
+    
+    // Limpiar errores al escribir
+    form.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(field => {
+        field.addEventListener('input', function() {
+            this.classList.remove('error');
+            const errorDiv = this.nextElementSibling;
+            if (errorDiv && errorDiv.classList.contains('form-error')) {
+                errorDiv.remove();
+            }
+        });
+    });
+});
+
+function showNotification(message, type = 'success') {
+    // Tu función de notificación existente
+    const notification = document.createElement('div');
+    notification.textContent = `${type === 'success' ? '✓' : '⚠'} ${message}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'linear-gradient(135deg, #6366f1, #06b6d4)' : 'linear-gradient(135deg, #ef4444, #f59e0b)'};
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        z-index: 1000;
+        animation: slideInRight 0.4s ease-out;
+        font-weight: 600;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.4s ease-out';
+        setTimeout(() => notification.remove(), 400);
+    }, 3000);
+}
+</script>
+{% endblock %}

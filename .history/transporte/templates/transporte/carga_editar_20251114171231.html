@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Carga - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📦</span>
+    <span>Editar Carga</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-input" name="descripcion" value="{{ carga.descripcion }}" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Tipo de Carga</label>
+                <select class="form-select" name="tipo_carga" required>
+                    <option value="General" {% if carga.tipo_carga == 'General' %}selected{% endif %}>General</option>
+                    <option value="Peligrosa" {% if carga.tipo_carga == 'Peligrosa' %}selected{% endif %}>Peligrosa</option>
+                    <option value="Refrigerada" {% if carga.tipo_carga == 'Refrigerada' %}selected{% endif %}>Refrigerada</option>
+                    <option value="Frágil" {% if carga.tipo_carga == 'Frágil' %}selected{% endif %}>Frágil</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cliente</label>
+                <select class="form-select" name="cliente" required>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}" {% if carga.cliente.id == cliente.id %}selected{% endif %}>
+                        {{ cliente.razon_social|default:cliente.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Peso (kg)</label>
+                <input type="number" class="form-input" name="peso_kg" value="{{ carga.peso_kg }}" step="0.01" required min="0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Volumen (m³)</label>
+                <input type="number" class="form-input" name="volumen_m3" value="{{ carga.volumen_m3 }}" step="0.01" required min="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Valor Declarado</label>
+            <input type="number" class="form-input" name="valor_declarado" value="{{ carga.valor_declarado }}" step="0.01" placeholder="$" required min="0">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Notas Especiales</label>
+            <textarea class="form-input" name="notas_especiales" rows="3">{{ carga.notas_especiales|default:'' }}</textarea>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Carga</button>
+            <a href="{% url 'cargas' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

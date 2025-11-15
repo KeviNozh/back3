@@ -1,0 +1,177 @@
+{% extends 'transporte/base_datos.html' %}
+
+{% block title %}Aeronaves - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>✈️</span>
+    <span>Gestión de Aeronaves</span>
+</div>
+
+<!-- BLOQUE DE PERMISOS -->
+{% if user.is_authenticated and not es_admin %}
+<div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+        <span>🔒</span>
+        <div>
+            <strong>Modo Solo Lectura</strong>
+            <div style="font-size: 0.9rem; opacity: 0.9;">
+                Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="filters">
+    <div class="filter-group">
+        <select class="filter-select" id="filter-status">
+            <option value="">Todos los estados</option>
+            <option value="active">Activa</option>
+            <option value="inactive">Inactiva</option>
+        </select>
+        <select class="filter-select" id="filter-type">
+            <option value="">Todos los tipos</option>
+            <option value="Carga">Carga</option>
+            <option value="Pasajeros">Pasajeros</option>
+            <option value="Mixto">Mixto</option>
+        </select>
+    </div>
+    <input type="text" class="search-input" id="search-input" placeholder="Buscar aeronave...">
+    {% if es_admin %}
+    <button class="btn" onclick="window.location.href='{% url 'aeronave_crear' %}'">➕ Nueva Aeronave</button>
+    {% endif %}
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">Lista de Aeronaves</div>
+        <div id="aircraft-count" style="color: var(--text-secondary); font-size: 0.9rem;">
+            Total: {{ aeronaves.count }} aeronaves
+        </div>
+    </div>
+    
+    {% if aeronaves %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Matrícula</th>
+                <th>Modelo</th>
+                <th>Tipo</th>
+                <th>Capacidad</th>
+                <th>Piloto Asignado</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aeronave in aeronaves %}
+            <tr>
+                <td><strong>{{ aeronave.matricula }}</strong></td>
+                <td>{{ aeronave.modelo }}</td>
+                <td>
+                    <span class="badge 
+                        {% if aeronave.tipo_aeronave == 'Carga' %}cargo
+                        {% elif aeronave.tipo_aeronave == 'Pasajeros' %}passenger
+                        {% else %}mixed
+                        {% endif %}">
+                        {{ aeronave.tipo_aeronave }}
+                    </span>
+                </td>
+                <td>{{ aeronave.capacidad_kg }} kg</td>
+                <td>
+                    {% if aeronave.piloto_asignado %}
+                        {{ aeronave.piloto_asignado.nombre }}
+                    {% else %}
+                        <span style="color: var(--text-secondary);">Sin asignar</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge {% if aeronave.activo %}active{% else %}inactive{% endif %}">
+                        {% if aeronave.activo %}Activa{% else %}Inactiva{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <button class="action-btn" onclick="viewAircraft({{ aeronave.id }})">Ver</button>
+                    {% if es_admin %}
+                    <button class="action-btn" onclick="window.location.href='{% url 'aeronave_editar' aeronave.pk %}'">Editar</button>
+                    <button class="action-btn delete" onclick="deleteAircraft({{ aeronave.id }})">Eliminar</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">✈️</div>
+        <h3>No hay aeronaves registradas</h3>
+        <p>Comienza agregando la primera aeronave a la flota.</p>
+        {% if es_admin %}
+        <button class="btn" onclick="window.location.href='{% url 'aeronave_crear' %}'" style="margin-top: 1rem;">
+            ➕ Agregar Primera Aeronave
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Funciones básicas de filtrado
+document.addEventListener('DOMContentLoaded', function() {
+    const filterStatus = document.getElementById('filter-status');
+    const filterType = document.getElementById('filter-type');
+    const searchInput = document.getElementById('search-input');
+    
+    function filterTable() {
+        const statusValue = filterStatus.value;
+        const typeValue = filterType.value;
+        const searchValue = searchInput.value.toLowerCase();
+        
+        const rows = document.querySelectorAll('tbody tr');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const status = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
+            const type = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            const matricula = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            const modelo = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            
+            const matchesStatus = !statusValue || 
+                (statusValue === 'active' && status.includes('activa')) ||
+                (statusValue === 'inactive' && status.includes('inactiva'));
+                
+            const matchesType = !typeValue || type.includes(typeValue.toLowerCase());
+            const matchesSearch = !searchValue || 
+                matricula.includes(searchValue) || 
+                modelo.includes(searchValue);
+            
+            if (matchesStatus && matchesType && matchesSearch) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('aircraft-count').textContent = `Total: ${visibleCount} aeronaves`;
+    }
+    
+    filterStatus.addEventListener('change', filterTable);
+    filterType.addEventListener('change', filterTable);
+    searchInput.addEventListener('input', filterTable);
+});
+
+function viewAircraft(id) {
+    window.location.href = `/aeronaves/${id}/`;
+}
+
+function deleteAircraft(id) {
+    if (confirm('¿Está seguro de que desea eliminar esta aeronave?')) {
+        window.location.href = `/aeronaves/${id}/eliminar/`;
+    }
+}
+</script>
+{% endblock %}

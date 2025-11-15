@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} {{ titulo }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>{{ icono }}</span>
+    <span>{% if form.instance.pk %}Editar {{ titulo }}{% else %}Nuevo {{ titulo }}{% endif %}</span>
+</div>
+
+<div class="content-card">
+    <!-- Mostrar detalles si es edición -->
+    {% if form.instance.pk %}
+    <div style="margin-bottom: 2.5rem;">
+        <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+            <span>👁️</span>
+            <span>Detalles Actuales</span>
+        </h3>
+        <div class="detail-grid">
+            {% for campo, valor in detalles.items %}
+            <div class="detail-item">
+                <div class="detail-label">{{ campo }}</div>
+                <div class="detail-value">{{ valor }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <form method="post" id="mainForm">
+        {% csrf_token %}
+        
+        <!-- Sección de edición -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>📝</span>
+                <span>{% if form.instance.pk %}Editar Información{% else %}Información de Creación{% endif %}</span>
+            </h3>
+            
+            {% if tipo_formulario == 'aeronave' %}
+            <!-- Campos para Aeronave -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Matrícula *</label>
+                    <input type="text" class="form-input" name="matricula" value="{{ aeronave.matricula }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo de Aeronave *</label>
+                    <input type="text" class="form-input" name="tipo_aeronave" value="{{ aeronave.tipo_aeronave }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Modelo *</label>
+                    <input type="text" class="form-input" name="modelo" value="{{ aeronave.modelo }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Capacidad (kg) *</label>
+                    <input type="number" class="form-input" name="capacidad_kg" value="{{ aeronave.capacidad_kg }}" required min="0">
+                </div>
+            </div>
+
+            <div style="max-width: 400px; margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Piloto Asignado</label>
+                    <select class="form-select" name="piloto_asignado">
+                        <option value="">Sin asignar</option>
+                        {% for piloto in pilotos %}
+                        <option value="{{ piloto.id }}" {% if aeronave.piloto_asignado.id == piloto.id %}selected{% endif %}>
+                            {{ piloto.nombre }} ({{ piloto.certificacion }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            {% elif tipo_formulario == 'carga' %}
+            <!-- Campos para Carga -->
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Descripción *</label>
+                    <input type="text" class="form-input" name="descripcion" value="{{ carga.descripcion }}" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Carga *</label>
+                        <select class="form-select" name="tipo_carga" required>
+                            <option value="General" {% if carga.tipo_carga == 'General' %}selected{% endif %}>General</option>
+                            <option value="Peligrosa" {% if carga.tipo_carga == 'Peligrosa' %}selected{% endif %}>Peligrosa</option>
+                            <option value="Refrigerada" {% if carga.tipo_carga == 'Refrigerada' %}selected{% endif %}>Refrigerada</option>
+                            <option value="Frágil" {% if carga.tipo_carga == 'Frágil' %}selected{% endif %}>Frágil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cliente *</label>
+                        <select class="form-select" name="cliente" required>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}" {% if carga.cliente.id == cliente.id %}selected{% endif %}>
+                                {{ cliente.razon_social|default:cliente.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Peso (kg) *</label>
+                        <input type="number" class="form-input" name="peso_kg" value="{{ carga.peso_kg }}" step="0.01" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Volumen (m³) *</label>
+                        <input type="number" class="form-input" name="volumen_m3" value="{{ carga.volumen_m3 }}" step="0.01" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valor Declarado ($) *</label>
+                        <input type="number" class="form-input" name="valor_declarado" value="{{ carga.valor_declarado }}" step="0.01" required min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notas Especiales</label>
+                    <textarea class="form-input" name="notas_especiales" rows="4">{{ carga.notas_especiales|default:'' }}</textarea>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Estado activo/inactivo -->
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" name="activo" {% if object.activo %}checked{% endif %}>
+                    <span>Activo</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            {% if form.instance.pk %}
+            <button type="submit" class="btn btn-success" name="accion" value="actualizar">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    💾 Actualizar
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger" onclick="confirmarEliminacion()">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    🗑️ Eliminar
+                </span>
+            </button>
+            {% else %}
+            <button type="submit" class="btn btn-success" name="accion" value="crear">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    ➕ Crear
+                </span>
+            </button>
+            {% endif %}
+            <a href="{% url url_lista %}" class="btn btn-secondary">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    ↩️ Cancelar
+                </span>
+            </a>
+        </div>
+    </form>
+
+    <!-- Formulario oculto para eliminación -->
+    {% if form.instance.pk %}
+    <form method="post" id="deleteForm" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="eliminar">
+    </form>
+    {% endif %}
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    background: rgba(51, 65, 85, 0.3);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .content-card > div > div {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+function confirmarEliminacion() {
+    if (confirm('¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.')) {
+        document.getElementById('deleteForm').submit();
+    }
+}
+
+// Mostrar notificación si hay mensajes
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si hay mensajes de Django
+    const alerts = document.querySelectorAll('.alert');
+    if (alerts.length > 0) {
+        setTimeout(() => {
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    }
+});
+
+// Validación básica del formulario
+document.getElementById('mainForm').addEventListener('submit', function(e) {
+    const requiredFields = this.querySelectorAll('[required]');
+    let valid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            valid = false;
+            field.style.borderColor = 'var(--danger)';
+        } else {
+            field.style.borderColor = 'var(--border)';
+        }
+    });
+    
+    if (!valid) {
+        e.preventDefault();
+        showNotification('Por favor, complete todos los campos requeridos', 'error');
+    }
+});
+
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    
+    let backgroundColor = 'linear-gradient(135deg, #10b981, #059669)';
+    if (type === 'error') {
+        backgroundColor = 'linear-gradient(135deg, #ef4444, #dc2626)';
+    } else if (type === 'warning') {
+        backgroundColor = 'linear-gradient(135deg, #f59e0b, #d97706)';
+    }
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${backgroundColor};
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        animation: slideInRight 0.4s ease-out;
+        font-weight: 600;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.4s ease-out';
+        setTimeout(() => notification.remove(), 400);
+    }, 4000);
+}
+
+// Estilos de animación para notificaciones
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Logística Global{% endblock %}</title>
+    <style>
+        /* Mantener todos los estilos del base.html original */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        /* ... resto de estilos ... */
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo" onclick="window.location.href='{% url 'dashboard' %}'">
+                <div class="logo-icon">🚚</div>
+                <span>Logística Global</span>
+            </div>
+            
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                    <div>
+                        <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                            {% if user.is_superuser %}
+                                👑 SUPERUSUARIO
+                            {% else %}
+                                {{ user.perfilusuario.tipo_usuario|title }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="avatar" onclick="window.location.href='{% url 'logout' %}'" title="Cerrar sesión">
+                        {{ user.username|slice:":2"|upper }}
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Contenido Principal -->
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

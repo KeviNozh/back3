@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📊</span>
+    <span>Mi Dashboard</span>
+</div>
+
+<div class="content-card" style="text-align: center; padding: 4rem 2rem;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">👋</div>
+    <h2 style="margin-bottom: 1rem; color: var(--primary);">
+        Bienvenido, {{ nombre_usuario }}
+    </h2>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem;">
+        {% if tipo_usuario == 'CLIENTE' %}
+        Como cliente, puedes visualizar información de vehículos, rutas y aeronaves disponibles.
+        {% elif tipo_usuario == 'CONDUCTOR' %}
+        Como conductor, puedes ver tus despachos asignados y la información de rutas.
+        {% elif tipo_usuario == 'PILOTO' %}
+        Como piloto, puedes ver tus vuelos asignados y la información de aeronaves.
+        {% else %}
+        Bienvenido al sistema de gestión de transporte.
+        {% endif %}
+    </p>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem;">
+        {% if tipo_usuario == 'CLIENTE' %}
+        <button class="btn" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Ver Vehículos</button>
+        <button class="btn" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Ver Rutas</button>
+        <button class="btn" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Ver Aeronaves</button>
+        {% elif tipo_usuario == 'CONDUCTOR' %}
+        <button class="btn" onclick="window.location.href='{% url 'despachos' %}'">📦 Mis Despachos</button>
+        <button class="btn" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</button>
+        <button class="btn" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</button>
+        {% elif tipo_usuario == 'PILOTO' %}
+        <button class="btn" onclick="window.location.href='{% url 'despachos' %}'">📦 Mis Vuelos</button>
+        <button class="btn" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</button>
+        <button class="btn" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas Aéreas</button>
+        {% endif %}
+    </div>
+
+    <!-- Información de sistema para todos los usuarios -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                📊
+            </div>
+            <div>
+                <div class="stat-value">Sistema</div>
+                <div class="stat-label">Operativo</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), var(--accent));">
+                ✅
+            </div>
+            <div>
+                <div class="stat-value">Activo</div>
+                <div class="stat-label">Tu cuenta</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--info), var(--secondary));">
+                🕒
+            </div>
+            <div>
+                <div class="stat-value">{{ "Ahora" }}</div>
+                <div class="stat-label">{{ current_time|date:"H:i" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+    // Actualizar hora en tiempo real
+    function updateTime() {
+        const now = new Date();
+        document.querySelector('.stat-value:last-child').textContent = 
+            now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    setInterval(updateTime, 60000);
+    updateTime();
+</script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Piloto - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗑️</span>
+    <span>Eliminar Piloto</span>
+</div>
+
+<div class="content-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+        <h2 style="margin-bottom: 1rem;">¿Estás seguro de que deseas eliminar este piloto?</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            Piloto: {{ piloto.nombre }}<br>
+            Certificación: {{ piloto.certificacion }}<br>
+            Esta acción no se puede deshacer.
+        </p>
+    </div>
+
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        <div class="action-buttons" style="justify-content: center;">
+            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            <a href="{% url 'pilotos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+============================================================
+
+
+===== piloto_detail.html =====
+<!-- piloto_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}Piloto {{ piloto.nombre }} - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👨‍✈️</span>
+    <span>Piloto {{ piloto.nombre }}</span>
+</div>
+
+<div class="content-card">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">ID</div>
+            <div class="detail-value">{{ piloto.id }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Nombre</div>
+            <div class="detail-value">{{ piloto.nombre }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">RUT</div>
+            <div class="detail-value">{{ piloto.rut }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Certificación</div>
+            <div class="detail-value">{{ piloto.certificacion }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Teléfono</div>
+            <div class="detail-value">{{ piloto.telefono }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Email</div>
+            <div class="detail-value">{{ piloto.email }}</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Horas de Vuelo</div>
+            <div class="detail-value">{{ piloto.horas_vuelo }} horas</div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Estado</div>
+            <div class="detail-value">
+                <span class="badge {% if piloto.activo %}active{% else %}alert{% endif %}">
+                    {% if piloto.activo %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Aeronave Asignada</div>
+            <div class="detail-value">
+                {% if piloto.aeronave_set.exists %}
+                    {{ piloto.aeronave_set.first.matricula }}
+                {% else %}
+                    <span style="color: var(--text-secondary);">Sin asignar</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <div class="detail-label">Despachos Asignados</div>
+            <div class="detail-value">{{ piloto.despacho_set.count }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'piloto_edit' piloto.pk %}" class="btn">Editar</a>
+        <a href="{% url 'piloto_delete' piloto.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'pilotos' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

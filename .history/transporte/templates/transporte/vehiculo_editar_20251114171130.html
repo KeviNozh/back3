@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Vehículo - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🚛</span>
+    <span>Editar Vehículo</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Patente</label>
+                <input type="text" class="form-input" name="patente" value="{{ vehiculo.patente }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo de Vehículo</label>
+                <input type="text" class="form-input" name="tipo_vehiculo" value="{{ vehiculo.tipo_vehiculo }}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Modelo</label>
+                <input type="text" class="form-input" name="modelo" value="{{ vehiculo.modelo }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Capacidad (kg)</label>
+                <input type="number" class="form-input" name="capacidad_kg" value="{{ vehiculo.capacidad_kg }}" required min="0">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Año</label>
+                <input type="number" class="form-input" name="año" value="{{ vehiculo.año }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Conductor Asignado</label>
+                <select class="form-select" name="conductor_asignado">
+                    <option value="">Sin asignar</option>
+                    {% for conductor in conductores %}
+                    <option value="{{ conductor.id }}" {% if vehiculo.conductor_asignado and vehiculo.conductor_asignado.id == conductor.id %}selected{% endif %}>
+                        {{ conductor.nombre }} ({{ conductor.licencia }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" {% if vehiculo.activo %}checked{% endif %}> Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Vehículo</button>
+            <a href="{% url 'vehiculos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Conductor - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👨‍💼</span>
+    <span>Editar Conductor</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-input" name="nombre" value="{{ conductor.nombre }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">RUT</label>
+                <input type="text" class="form-input" name="rut" value="{{ conductor.rut }}" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Licencia</label>
+                <input type="text" class="form-input" name="licencia" value="{{ conductor.licencia }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input type="tel" class="form-input" name="telefono" value="{{ conductor.telefono }}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" name="email" value="{{ conductor.email }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" {% if conductor.activo %}checked{% endif %}> Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Conductor</button>
+            <a href="{% url 'conductores' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

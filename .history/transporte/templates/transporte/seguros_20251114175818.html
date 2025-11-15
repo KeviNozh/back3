@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguros - Sistema de Gestión de Transporte</title>
+    <style>
+        /* MANTENER TODOS LOS ESTILOS ORIGINALES EXACTAMENTE IGUAL */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Razón Social/Nombre</th>
+            <th>RUT</th>
+            <th>Persona de Contacto</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="clients-table-body">
+        <tr>
+            <td colspan="8" class="loading">Cargando datos de clientes desde la base de datos...</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- Modal para crear nuevo cliente -->
+<div id="newClientModal" class="modal">
+<div class="modal-content">
+    <span class="close-modal" onclick="closeModal('newClientModal')">&times;</span>
+    <h3>Nuevo Cliente</h3>
+    <form id="newClientForm">
+        <div class="form-group">
+            <label class="form-label">Tipo de Cliente</label>
+            <select class="form-select" name="tipo_cliente" required>
+                <option value="EMPRESA">Empresa</option>
+                <option value="INDIVIDUAL">Individual</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="empresa-fields">
+            <label class="form-label">Razón Social</label>
+            <input type="text" class="form-input" name="razon_social">
+        </div>
+        
+        <div class="form-row" id="individual-fields" style="display: none;">
+            <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-input" name="nombre">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Apellido</label>
+                <input type="text" class="form-input" name="apellido">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">RUT</label>
+                <input type="text" class="form-input" name="rut" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Persona de Contacto</label>
+                <input type="text" class="form-input" name="persona_contacto" required>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input type="text" class="form-input" name="telefono" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" name="email" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <textarea class="form-input" name="direccion" rows="3" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" checked> Activo
+            </label>
+        </div>
+        
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('newClientModal')">Cancelar</button>
+            <button type="submit" class="btn">Crear Cliente</button>
+        </div>
+    </form>
+</div>
+</div>
+
+<script>
+// Variable global para almacenar los clientes
+let clientsData = [];
+
+// Función para cargar clientes desde la base de datos
+async function loadClientsFromDatabase() {
+    try {
+        showLoadingState();
+        
+        const response = await fetch('/api/clientes/');
+        
+        if (!response.ok) {
+            throw new Error('Error al cargar los clientes');
+        }
+        
+        clientsData = await response.json();
+        renderClientsTable(clientsData);
+        showNotification('Datos de clientes cargados correctamente');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showErrorState('Error al cargar los clientes: ' + error.message);
+    }
+}
+
+// Función para mostrar estado de carga
+function showLoadingState() {
+    const tableBody = document.getElementById('clients-table-body');
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="8" class="loading">Cargando datos de clientes desde la base de datos...</td>
+        </tr>
+    `;
+    document.getElementById('client-count').textContent = 'Cargando...';
+}
+
+// Función para mostrar estado de error
+function showErrorState(message) {
+    const tableBody = document.getElementById('clients-table-body');
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="8">
+                <div class="error">
+                    ${message}
+                    <br>
+                    <button class="btn" onclick="loadClientsFromDatabase()" style="margin-top: 1rem;">
+                        Reintentar
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+    document.getElementById('client-count').textContent = 'Error';
+}
+
+// Función para renderizar la tabla de clientes
+function renderClientsTable(clients) {
+    const tableBody = document.getElementById('clients-table-body');
+    const clientCount = document.getElementById('client-count');
+    
+    if (clients.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="loading">No se encontraron clientes en la base de datos</td>
+            </tr>
+        `;
+        clientCount.textContent = 'Total: 0 clientes';
+        return;
+    }
+    
+    tableBody.innerHTML = '';
+    clientCount.textContent = `Total: ${clients.length} clientes`;
+    
+    clients.forEach(client => {
+        const row = document.createElement('tr');
+        
+        // USAR CAMPOS REALES DE LA BASE DE DATOS
+        let statusClass = '';
+        let statusText = '';
+        
+        if (client.activo) {
+            statusClass = 'active';
+            statusText = 'Activo';
+        } else {
+            statusClass = 'inactive';
+            statusText = 'Inactivo';
+        }
+
+        // Nombre/Razón social
+        const displayName = client.tipo_cliente === 'EMPRESA' ? 
+            client.razon_social : 
+            `${client.nombre} ${client.apellido}`;
+        
+        row.innerHTML = `
+            <td>${displayName || 'N/A'}</td>
+            <td>${client.rut || 'N/A'}</td>
+            <td>${client.persona_contacto || 'N/A'}</td>
+            <td>${client.telefono || 'N/A'}</td>
+            <td>${client.email || 'N/A'}</td>
+            <td>${client.tipo_cliente === 'EMPRESA' ? 'Empresa' : 'Individual'}</td>
+            <td><span class="badge ${statusClass}">${statusText}</span></td>
+            <td>
+                <button class="action-btn" onclick="viewClient(${client.id})">Ver</button>
+                <button class="action-btn" onclick="window.location.href='/clientes/${client.id}/editar/'">Editar</button>
+                <button class="action-btn delete" onclick="deleteClient(${client.id})">Eliminar</button>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+}
+
+// Función para filtrar clientes
+function filterClients() {
+    const statusFilter = document.getElementById('filter-status').value;
+    const typeFilter = document.getElementById('filter-type').value;
+    const searchText = document.getElementById('search-input').value.toLowerCase();
+    
+    const filteredClients = clientsData.filter(client => {
+        // Filtro por estado (usando campo 'activo' real)
+        const matchesStatus = !statusFilter || 
+            (statusFilter === 'active' && client.activo) ||
+            (statusFilter === 'inactive' && !client.activo);
+        
+        // Filtro por tipo
+        const matchesType = !typeFilter || 
+            (typeFilter === 'empresa' && client.tipo_cliente === 'EMPRESA') ||
+            (typeFilter === 'individual' && client.tipo_cliente === 'INDIVIDUAL');
+        
+        // Filtro por búsqueda
+        const matchesSearch = !searchText || 
+            (client.razon_social && client.razon_social.toLowerCase().includes(searchText)) ||
+            (client.nombre && client.nombre.toLowerCase().includes(searchText)) ||
+            (client.apellido && client.apellido.toLowerCase().includes(searchText)) ||
+            (client.rut && client.rut.toLowerCase().includes(searchText)) ||
+            (client.persona_contacto && client.persona_contacto.toLowerCase().includes(searchText));
+        
+        return matchesStatus && matchesType && matchesSearch;
+    });
+    
+    renderClientsTable(filteredClients);
+}
+
+// Funciones de acción para los clientes
+async function viewClient(clientId) {
+    try {
+        const response = await fetch(`/api/clientes/${clientId}/`);
+        const clientDetails = await response.json();
+        
+        showNotification(`Viendo detalles del cliente ${clientId}`);
+        console.log('Detalles del cliente:', clientDetails);
+        
+    } catch (error) {
+        console.error('Error al obtener detalles:', error);
+        showNotification('Error al cargar detalles del cliente');
+    }
+}
+
+async function deleteClient(clientId) {
+    if (confirm('¿Está seguro de que desea eliminar este cliente?')) {
+        try {
+            const response = await fetch(`/api/clientes/${clientId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                }
+            });
+            
+            if (response.ok) {
+                await loadClientsFromDatabase();
+                showNotification('Cliente eliminado correctamente');
+            } else {
+                throw new Error('Error al eliminar el cliente');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error al eliminar el cliente');
+        }
+    }
+}
+
+// Funciones para el modal de nuevo cliente
+function showNewClientModal() {
+    showModal('newClientModal');
+}
+
+function handleClientTypeChange() {
+    const tipoCliente = document.querySelector('select[name="tipo_cliente"]').value;
+    const empresaFields = document.getElementById('empresa-fields');
+    const individualFields = document.getElementById('individual-fields');
+    
+    if (tipoCliente === 'EMPRESA') {
+        empresaFields.style.display = 'block';
+        individualFields.style.display = 'none';
+    } else {
+        empresaFields.style.display = 'none';
+        individualFields.style.display = 'flex';
+    }
+}
+
+async function createClient(formData) {
+    try {
+        const response = await fetch('/api/clientes/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        if (response.ok) {
+            const newClient = await response.json();
+            showNotification('Cliente creado exitosamente');
+            closeModal('newClientModal');
+            await loadClientsFromDatabase();
+            return newClient;
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Error al crear el cliente');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al crear el cliente: ' + error.message);
+        throw error;
+    }
+}
+
+function handleClientFormSubmit(e) {
+    e.preventDefault();
+    
+    const tipoCliente = document.querySelector('select[name="tipo_cliente"]').value;
+    const formData = {
+        tipo_cliente: tipoCliente,
+        rut: document.querySelector('input[name="rut"]').value,
+        persona_contacto: document.querySelector('input[name="persona_contacto"]').value,
+        telefono: document.querySelector('input[name="telefono"]').value,
+        email: document.querySelector('input[name="email"]').value,
+        direccion: document.querySelector('textarea[name="direccion"]').value,
+        activo: document.querySelector('input[name="activo"]').checked
+    };
+    
+    if (tipoCliente === 'EMPRESA') {
+        formData.razon_social = document.querySelector('input[name="razon_social"]').value;
+        formData.nombre = null;
+        formData.apellido = null;
+    } else {
+        formData.razon_social = null;
+        formData.nombre = document.querySelector('input[name="nombre"]').value;
+        formData.apellido = document.querySelector('input[name="apellido"]').value;
+    }
+    
+    createClient(formData);
+}
+
+// Funciones auxiliares para modals
+function showModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    // Resetear formulario
+    if (modalId === 'newClientModal') {
+        document.getElementById('newClientForm').reset();
+        handleClientTypeChange(); // Resetear campos visibles
+    }
+}
+
+// Función auxiliar para obtener el token CSRF
+function getCSRFToken() {
+    const name = 'csrftoken';
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Función para mostrar notificaciones
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.textContent = `✓ ${message}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #6366f1, #06b6d4);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        z-index: 1000;
+        animation: slideInRight 0.4s ease-out;
+        font-weight: 600;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.4s ease-out';
+        setTimeout(() => notification.remove(), 400);
+    }, 3000);
+}
+
+// Inicialización cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    loadClientsFromDatabase();
+    
+    document.getElementById('filter-status').addEventListener('change', filterClients);
+    document.getElementById('filter-type').addEventListener('change', filterClients);
+    document.getElementById('search-input').addEventListener('input', filterClients);
+    
+    document.getElementById('new-client-btn').addEventListener('click', showNewClientModal);
+    
+    document.getElementById('newClientForm').addEventListener('submit', handleClientFormSubmit);
+    
+    // Manejar cambio de tipo de cliente
+    document.querySelector('select[name="tipo_cliente"]').addEventListener('change', handleClientTypeChange);
+    
+    console.log('👥 Módulo de Clientes cargado exitosamente');
+});
+
+// Estilos para las animaciones de notificaciones
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+</script>
+</body>
+</html>

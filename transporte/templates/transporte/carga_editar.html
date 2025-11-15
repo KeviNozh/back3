@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Carga - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>📦</span>
+    <span>Editar Carga</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Sección 1: Información General -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>📋</span>
+                <span>Información General</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Descripción *</label>
+                    <input type="text" class="form-input" name="descripcion" value="{{ carga.descripcion }}" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Carga *</label>
+                        <select class="form-select" name="tipo_carga" required>
+                            <option value="General" {% if carga.tipo_carga == 'General' %}selected{% endif %}>General</option>
+                            <option value="Peligrosa" {% if carga.tipo_carga == 'Peligrosa' %}selected{% endif %}>Peligrosa</option>
+                            <option value="Refrigerada" {% if carga.tipo_carga == 'Refrigerada' %}selected{% endif %}>Refrigerada</option>
+                            <option value="Frágil" {% if carga.tipo_carga == 'Frágil' %}selected{% endif %}>Frágil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cliente *</label>
+                        <select class="form-select" name="cliente" required>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}" {% if carga.cliente.id == cliente.id %}selected{% endif %}>
+                                {{ cliente.razon_social|default:cliente.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 2: Especificaciones -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>⚖️</span>
+                <span>Especificaciones</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Peso (kg) *</label>
+                    <input type="number" class="form-input" name="peso_kg" value="{{ carga.peso_kg }}" step="0.01" required min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Volumen (m³) *</label>
+                    <input type="number" class="form-input" name="volumen_m3" value="{{ carga.volumen_m3 }}" step="0.01" required min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Valor Declarado ($) *</label>
+                    <input type="number" class="form-input" name="valor_declarado" value="{{ carga.valor_declarado }}" step="0.01" required min="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 3: Información Adicional -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>📝</span>
+                <span>Información Adicional</span>
+            </h3>
+            <div class="form-group">
+                <label class="form-label">Notas Especiales</label>
+                <textarea class="form-input" name="notas_especiales" rows="4">{{ carga.notas_especiales|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Carga</button>
+            <a href="{% url 'cargas' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .content-card > div > div {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

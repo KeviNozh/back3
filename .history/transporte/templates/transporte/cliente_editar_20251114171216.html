@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Cliente - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👥</span>
+    <span>Editar Cliente</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label">Tipo de Cliente</label>
+            <select class="form-select" name="tipo_cliente" id="tipo_cliente" required onchange="toggleClienteFields(this.value)">
+                <option value="EMPRESA" {% if cliente.tipo_cliente == 'EMPRESA' %}selected{% endif %}>Empresa</option>
+                <option value="INDIVIDUAL" {% if cliente.tipo_cliente == 'INDIVIDUAL' %}selected{% endif %}>Individual</option>
+            </select>
+        </div>
+
+        <div id="empresaFields" {% if cliente.tipo_cliente == 'EMPRESA' %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+            <div class="form-group">
+                <label class="form-label">Razón Social</label>
+                <input type="text" class="form-input" name="razon_social" value="{{ cliente.razon_social|default:'' }}">
+            </div>
+        </div>
+
+        <div id="individualFields" {% if cliente.tipo_cliente == 'INDIVIDUAL' %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-input" name="nombre" value="{{ cliente.nombre|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellido</label>
+                    <input type="text" class="form-input" name="apellido" value="{{ cliente.apellido|default:'' }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">RUT</label>
+            <input type="text" class="form-input" name="rut" value="{{ cliente.rut }}" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Persona de Contacto</label>
+                <input type="text" class="form-input" name="persona_contacto" value="{{ cliente.persona_contacto }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input type="tel" class="form-input" name="telefono" value="{{ cliente.telefono }}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" name="email" value="{{ cliente.email }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <textarea class="form-input" name="direccion" rows="3" required>{{ cliente.direccion }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" {% if cliente.activo %}checked{% endif %}> Activo
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Cliente</button>
+            <a href="{% url 'clientes' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleClienteFields(tipo) {
+    const empresaFields = document.getElementById('empresaFields');
+    const individualFields = document.getElementById('individualFields');
+    
+    if (tipo === 'EMPRESA') {
+        empresaFields.style.display = 'block';
+        individualFields.style.display = 'none';
+    } else {
+        empresaFields.style.display = 'none';
+        individualFields.style.display = 'block';
+    }
+}
+</script>
+{% endblock %}

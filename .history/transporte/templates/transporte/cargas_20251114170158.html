@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargas - Sistema de Gestión de Transporte</title>
+    <style>
+        /* Todos los estilos del dashboard original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            animation: float 25s infinite;
+            border-radius: 50%;
+        }
+
+        .bg-animation span:nth-child(1) { left: 25%; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 30s; }
+        .bg-animation span:nth-child(3) { left: 70%; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            animation: rotate3d 3s infinite ease-in-out;
+        }
+
+        @keyframes rotate3d {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), var(--danger));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .search-input {
+            padding: 0.8rem 1.2rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.entregado {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge.transito {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.cargado {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .badge.pendiente {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .badge.general {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.peligrosa {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.refrigerada {
+            background: rgba(14, 165, 233, 0.2);
+            color: #38bdf8;
+        }
+
+        .badge.fragil {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.6rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select, .search-input {
+                min-width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 800px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🚚</div>
+                <span>Logística Global</span>
+            </div>
+                        <div class="user-info">
+                {% if user.is_authenticated %}
+                <div>
+                    <div style="font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        {% if user.is_staff %}Administrador{% else %}Usuario{% endif %}
+                    </div>
+                </div>
+                <div class="avatar" onclick="window.location.href='{% url 'logout' %}'" title="Cerrar sesión">
+                    {{ user.username|slice:":2"|upper }}
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='{% url 'dashboard' %}'">📊 Dashboard</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
+        </div>
+
+        <div class="page-title">
+            <span>📦</span>
+            <span>Gestión de Cargas</span>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <select class="filter-select" id="filter-status">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="cargado">Cargado</option>
+                    <option value="transito">En tránsito</option>
+                    <option value="entregado">Entregado</option>
+                </select>
+                <select class="filter-select" id="filter-type">
+                    <option value="">Todos los tipos</option>
+                    <option value="general">General</option>
+                    <option value="peligrosa">Peligrosa</option>
+                    <option value="refrigerada">Refrigerada</option>
+                    <option value="fragil">Frágil</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar carga...">
+            <button class="btn" id="new-cargo-btn">➕ Nueva Carga</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Cargas</div>
+                <div id="cargo-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID Carga</th>
+                        <th>Descripción</th>
+                        <th>Tipo</th>
+                        <th>Peso (kg)</th>
+                        <th>Volumen (m³)</th>
+                        <th>Valor Declarado</th>
+                        <th>Cliente</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cargos-table-body">
+                    <tr>
+                        <td colspan="9" class="loading">Cargando datos de cargas desde la base de datos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="newCargaModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('newCargaModal')">&times;</span>
+            <h3>Nueva Carga</h3>
+            <form id="newCargaForm">
+                <div class="form-group">
+                    <label class="form-label">Descripción</label>
+                    <input type="text" class="form-input" name="descripcion" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Carga</label>
+                        <select class="form-select" name="tipo_carga" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="General">General</option>
+                            <option value="Peligrosa">Peligrosa</option>
+                            <option value="Refrigerada">Refrigerada</option>
+                            <option value="Frágil">Frágil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cliente</label>
+                        <select class="form-select" name="cliente" id="cliente-select" required>
+                            <option value="">Seleccionar cliente</option>
+                            <!-- Los clientes se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Peso (kg)</label>
+                        <input type="number" class="form-input" name="peso_kg" step="0.01" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Volumen (m³)</label>
+                        <input type="number" class="form-input" name="volumen_m3" step="0.01" required min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Valor Declarado</label>
+                        <input type="number" class="form-input" name="valor_declarado" step="0.01" placeholder="$" required min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notas Especiales</label>
+                    <textarea class="form-input" name="notas_especiales" rows="3"></textarea>
+                </div>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newCargaModal')">Cancelar</button>
+                    <button type="submit" class="btn">Crear Carga</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewCargaModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('viewCargaModal')">&times;</span>
+            <h3 id="viewCargaTitle">Detalles de la Carga</h3>
+            <div id="viewCargaContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variable global para almacenar las cargas
+        let cargosData = [];
+
+        // Función para cargar cargas desde la base de datos
+        async function loadCargosFromDatabase() {
+            try {
+                showLoadingState();
+                
+                const response = await fetch('/api/cargas/');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar las cargas');
+                }
+                
+                cargosData = await response.json();
+                renderCargosTable(cargosData);
+                showNotification('Datos de cargas cargados correctamente');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorState('Error al cargar las cargas: ' + error.message);
+            }
+        }
+
+        // Función para mostrar estado de carga
+        function showLoadingState() {
+            const tableBody = document.getElementById('cargos-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="loading">Cargando datos de cargas desde la base de datos...</td>
+                </tr>
+            `;
+            document.getElementById('cargo-count').textContent = 'Cargando...';
+        }
+
+        // Función para mostrar estado de error
+        function showErrorState(message) {
+            const tableBody = document.getElementById('cargos-table-body');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9">
+                        <div class="error">
+                            ${message}
+                            <br>
+                            <button class="btn" onclick="loadCargosFromDatabase()" style="margin-top: 1rem;">
+                                Reintentar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('cargo-count').textContent = 'Error';
+        }
+
+        // Función para simular estado (ya que no existe en el modelo Carga)
+        function getCargoStatus(cargoId) {
+            const statuses = ['pendiente', 'cargado', 'transito', 'entregado'];
+            return statuses[cargoId % statuses.length];
+        }
+
+        // Función para formatear moneda
+        function formatCurrency(amount) {
+            if (!amount) return 'N/A';
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP'
+            }).format(amount);
+        }
+
+        // Función para renderizar la tabla de cargas
+        function renderCargosTable(cargos) {
+            const tableBody = document.getElementById('cargos-table-body');
+            const cargoCount = document.getElementById('cargo-count');
+            
+            if (cargos.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="loading">No se encontraron cargas en la base de datos</td>
+                    </tr>
+                `;
+                cargoCount.textContent = 'Total: 0 cargas';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            cargoCount.textContent = `Total: ${cargos.length} cargas`;
+            
+            cargos.forEach(cargo => {
+                const row = document.createElement('tr');
+                
+                // USAR CAMPOS REALES DE LA BASE DE DATOS
+                const status = getCargoStatus(cargo.id); // Estado simulado
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                switch (status) {
+                    case 'entregado':
+                        statusClass = 'entregado';
+                        statusText = 'Entregado';
+                        break;
+                    case 'transito':
+                        statusClass = 'transito';
+                        statusText = 'En tránsito';
+                        break;
+                    case 'cargado':
+                        statusClass = 'cargado';
+                        statusText = 'Cargado';
+                        break;
+                    case 'pendiente':
+                        statusClass = 'pendiente';
+                        statusText = 'Pendiente';
+                        break;
+                    default:
+                        statusClass = 'pendiente';
+                        statusText = 'Pendiente';
+                }
+
+                // Tipo basado en campo real 'tipo_carga'
+                let typeClass = '';
+                let typeText = cargo.tipo_carga || 'General';
+                
+                switch (cargo.tipo_carga?.toLowerCase()) {
+                    case 'peligrosa':
+                        typeClass = 'peligrosa';
+                        break;
+                    case 'refrigerada':
+                        typeClass = 'refrigerada';
+                        break;
+                    case 'frágil':
+                    case 'fragil':
+                        typeClass = 'fragil';
+                        break;
+                    default:
+                        typeClass = 'general';
+                }
+                
+                // Obtener nombre del cliente
+                const clienteNombre = cargo.cliente ? 
+                    (cargo.cliente_razon_social || cargo.cliente.razon_social || 'Cliente') : 
+                    'N/A';
+                
+                row.innerHTML = `
+                    <td>${cargo.id || 'N/A'}</td>
+                    <td>${cargo.descripcion || 'N/A'}</td>
+                    <td><span class="badge ${typeClass}">${typeText}</span></td>
+                    <td>${cargo.peso_kg ? cargo.peso_kg + ' kg' : 'N/A'}</td>
+                    <td>${cargo.volumen_m3 ? cargo.volumen_m3 + ' m³' : 'N/A'}</td>
+                    <td>${formatCurrency(cargo.valor_declarado)}</td>
+                    <td>${clienteNombre}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="viewCargo(${cargo.id})">Ver</button>
+                        <button class="action-btn" onclick="editCargo(${cargo.id})">Editar</button>
+                        <button class="action-btn delete" onclick="deleteCargo(${cargo.id})">Eliminar</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para filtrar cargas
+        function filterCargos() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            
+            const filteredCargos = cargosData.filter(cargo => {
+                // Estado simulado
+                const status = getCargoStatus(cargo.id);
+                const matchesStatus = !statusFilter || status === statusFilter;
+                
+                // Tipo real
+                const matchesType = !typeFilter || 
+                    (cargo.tipo_carga && cargo.tipo_carga.toLowerCase().includes(typeFilter.toLowerCase()));
+                
+                // Búsqueda
+                const matchesSearch = !searchText || 
+                    (cargo.descripcion && cargo.descripcion.toLowerCase().includes(searchText)) ||
+                    (cargo.cliente_razon_social && cargo.cliente_razon_social.toLowerCase().includes(searchText)) ||
+                    (cargo.id && cargo.id.toString().includes(searchText));
+                
+                return matchesStatus && matchesType && matchesSearch;
+            });
+            
+            renderCargosTable(filteredCargos);
+        }
+
+        // Funciones de acción para las cargas
+        async function viewCargo(cargoId) {
+            try {
+                const response = await fetch(`/api/cargas/${cargoId}/`);
+                const cargoDetails = await response.json();
+                
+                showNotification(`Viendo detalles de la carga ${cargoId}`);
+                
+                // Mostrar detalles en modal
+                document.getElementById('viewCargaTitle').textContent = `Detalles de Carga #${cargoId}`;
+                document.getElementById('viewCargaContent').innerHTML = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div><strong>Descripción:</strong> ${cargoDetails.descripcion || 'N/A'}</div>
+                        <div><strong>Tipo:</strong> ${cargoDetails.tipo_carga || 'N/A'}</div>
+                        <div><strong>Peso:</strong> ${cargoDetails.peso_kg || 'N/A'} kg</div>
+                        <div><strong>Volumen:</strong> ${cargoDetails.volumen_m3 || 'N/A'} m³</div>
+                        <div><strong>Valor Declarado:</strong> ${formatCurrency(cargoDetails.valor_declarado)}</div>
+                        <div><strong>Cliente:</strong> ${cargoDetails.cliente_razon_social || 'N/A'}</div>
+                        <div><strong>Notas:</strong> ${cargoDetails.notas_especiales || 'Sin notas especiales'}</div>
+                    </div>
+                `;
+                showModal('viewCargaModal');
+                
+            } catch (error) {
+                console.error('Error al obtener detalles:', error);
+                showNotification('Error al cargar detalles de la carga');
+            }
+        }
+
+        async function editCargo(cargoId) {
+            showNotification(`Editando la carga ${cargoId}`);
+            // Redirigir a página de edición
+            window.location.href = `/cargas/${cargoId}/editar/`;
+        }
+
+        async function deleteCargo(cargoId) {
+            if (confirm('¿Está seguro de que desea eliminar esta carga?')) {
+                try {
+                    const response = await fetch(`/api/cargas/${cargoId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        await loadCargosFromDatabase();
+                        showNotification('Carga eliminada correctamente');
+                    } else {
+                        throw new Error('Error al eliminar la carga');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar la carga');
+                }
+            }
+        }
+
+        // FUNCIONES NUEVAS PARA CREAR CARGAS
+        async function loadClientesForSelect() {
+            try {
+                const response = await fetch('/api/clientes/');
+                if (response.ok) {
+                    const clientes = await response.json();
+                    const select = document.getElementById('cliente-select');
+                    
+                    // Limpiar opciones excepto la primera
+                    while (select.children.length > 1) {
+                        select.removeChild(select.lastChild);
+                    }
+                    
+                    // Agregar clientes activos
+                    clientes.forEach(cliente => {
+                        if (cliente.activo) {
+                            const option = document.createElement('option');
+                            option.value = cliente.id;
+                            option.textContent = cliente.razon_social || cliente.nombre || `Cliente ${cliente.id}`;
+                            select.appendChild(option);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar clientes:', error);
+                // Si hay error, mostrar opciones de ejemplo
+                const select = document.getElementById('cliente-select');
+                const option = document.createElement('option');
+                option.value = "1";
+                option.textContent = "Cliente de Ejemplo";
+                select.appendChild(option);
+            }
+        }
+
+        async function createCarga(formData) {
+            try {
+                const response = await fetch('/api/cargas/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    const newCarga = await response.json();
+                    showNotification('Carga creada exitosamente');
+                    closeModal('newCargaModal');
+                    await loadCargosFromDatabase(); // Recargar la lista
+                    return newCarga;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al crear la carga');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error al crear la carga: ' + error.message);
+                throw error;
+            }
+        }
+
+        function handleCargaFormSubmit(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = {
+                descripcion: form.querySelector('input[name="descripcion"]').value,
+                tipo_carga: form.querySelector('select[name="tipo_carga"]').value,
+                peso_kg: parseFloat(form.querySelector('input[name="peso_kg"]').value),
+                volumen_m3: parseFloat(form.querySelector('input[name="volumen_m3"]').value),
+                valor_declarado: parseFloat(form.querySelector('input[name="valor_declarado"]').value),
+                cliente: form.querySelector('select[name="cliente"]').value,
+                notas_especiales: form.querySelector('textarea[name="notas_especiales"]').value
+            };
+            
+            createCarga(formData);
+        }
+
+        async function showNewCargaModal() {
+            await loadClientesForSelect();
+            showModal('newCargaModal');
+        }
+
+        // Función auxiliar para obtener el token CSRF
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Modal Functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Resetear formulario
+            if (modalId === 'newCargaModal') {
+                document.getElementById('newCargaForm').reset();
+            }
+        }
+
+        // Notification System
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = `✓ ${message}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #6366f1, #06b6d4);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                z-index: 1000;
+                animation: slideInRight 0.4s ease-out;
+                font-weight: 600;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease-out';
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Inicialización cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCargosFromDatabase();
+            
+            document.getElementById('filter-status').addEventListener('change', filterCargos);
+            document.getElementById('filter-type').addEventListener('change', filterCargos);
+            document.getElementById('search-input').addEventListener('input', filterCargos);
+            
+            // Actualizado para abrir el modal y cargar clientes
+            document.getElementById('new-cargo-btn').addEventListener('click', showNewCargaModal);
+            
+            // Agregar event listener para el formulario
+            document.getElementById('newCargaForm').addEventListener('submit', handleCargaFormSubmit);
+            
+            console.log('📦 Módulo de Cargas cargado exitosamente');
+        });
+
+        // Estilos para las animaciones de notificaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

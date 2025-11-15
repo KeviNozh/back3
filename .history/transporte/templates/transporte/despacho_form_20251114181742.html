@@ -1,0 +1,159 @@
+{% extends 'transporte/form_base.html' %}
+
+{% block content %}
+<script>
+// Configuración específica para el formulario de despacho
+const formConfig = {
+    icon: '📦',
+    title: '{% if despacho %}Editar Despacho{% else %}Nuevo Despacho{% endif %}',
+    description: 'Complete la información del despacho. Los campos marcados con <span style="color: var(--danger);">*</span> son obligatorios.',
+    submit_icon: '💾',
+    submit_text: '{% if despacho %}Actualizar Despacho{% else %}Crear Despacho{% endif %}',
+    cancel_url: '{% url "despachos" %}',
+    form_sections: [
+        {
+            icon: '👥',
+            title: 'Información del Cliente y Carga',
+            fields: [
+                {
+                    name: 'cliente',
+                    label: 'Cliente',
+                    type: 'select',
+                    required: true,
+                    value: '{{ despacho.cliente.id|default:"" }}',
+                    options: [
+                        {% for cliente in clientes %}
+                        { value: '{{ cliente.id }}', text: '{{ cliente.razon_social|default:cliente.nombre }}' },
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'carga',
+                    label: 'Carga',
+                    type: 'select',
+                    required: true,
+                    value: '{{ despacho.carga.id|default:"" }}',
+                    options: [
+                        {% for carga in cargas %}
+                        { value: '{{ carga.id }}', text: '{{ carga.descripcion }} - {{ carga.peso_kg }}kg' },
+                        {% endfor %}
+                    ]
+                }
+            ]
+        },
+        {
+            icon: '🗺️',
+            title: 'Ruta y Transporte',
+            fields: [
+                {
+                    name: 'ruta',
+                    label: 'Ruta',
+                    type: 'select',
+                    required: true,
+                    value: '{{ despacho.ruta.id|default:"" }}',
+                    options: [
+                        {% for ruta in rutas %}
+                        { value: '{{ ruta.id }}', text: '{{ ruta.origen }} - {{ ruta.destino }} ({{ ruta.tipo_transporte }})' },
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'estado',
+                    label: 'Estado del Despacho',
+                    type: 'select',
+                    required: true,
+                    value: '{{ despacho.estado|default:"PENDIENTE" }}',
+                    options: [
+                        { value: 'PENDIENTE', text: 'Pendiente' },
+                        { value: 'EN_RUTA', text: 'En Ruta' },
+                        { value: 'ENTREGADO', text: 'Entregado' },
+                        { value: 'CANCELADO', text: 'Cancelado' }
+                    ]
+                }
+            ]
+        },
+        {
+            icon: '💰',
+            title: 'Información de Costos',
+            fields: [
+                {
+                    name: 'costo_envio',
+                    label: 'Costo de Envío ($)',
+                    type: 'number',
+                    required: true,
+                    value: '{{ despacho.costo_envio|default:"" }}',
+                    placeholder: '0.00',
+                    step: '0.01',
+                    min: '0'
+                }
+            ]
+        },
+        {
+            icon: '🚚',
+            title: 'Asignación de Recursos (Opcional)',
+            fields: [
+                {
+                    name: 'vehiculo',
+                    label: 'Vehículo',
+                    type: 'select',
+                    required: false,
+                    value: '{{ despacho.vehiculo.id|default:"" }}',
+                    options: [
+                        { value: '', text: 'Sin asignar' },
+                        {% for vehiculo in vehiculos %}
+                        { value: '{{ vehiculo.id }}', text: '{{ vehiculo.patente }} - {{ vehiculo.modelo }}' },
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'aeronave',
+                    label: 'Aeronave',
+                    type: 'select',
+                    required: false,
+                    value: '{{ despacho.aeronave.id|default:"" }}',
+                    options: [
+                        { value: '', text: 'Sin asignar' },
+                        {% for aeronave in aeronaves %}
+                        { value: '{{ aeronave.id }}', text: '{{ aeronave.matricula }} - {{ aeronave.modelo }}' },
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'conductor',
+                    label: 'Conductor',
+                    type: 'select',
+                    required: false,
+                    value: '{{ despacho.conductor.id|default:"" }}',
+                    options: [
+                        { value: '', text: 'Sin asignar' },
+                        {% for conductor in conductores %}
+                        { value: '{{ conductor.id }}', text: '{{ conductor.nombre }} ({{ conductor.licencia }})' },
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'piloto',
+                    label: 'Piloto',
+                    type: 'select',
+                    required: false,
+                    value: '{{ despacho.piloto.id|default:"" }}',
+                    options: [
+                        { value: '', text: 'Sin asignar' },
+                        {% for piloto in pilotos %}
+                        { value: '{{ piloto.id }}', text: '{{ piloto.nombre }} ({{ piloto.certificacion }})' },
+                        {% endfor %}
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
+// Inicializar el formulario con la configuración
+document.addEventListener('DOMContentLoaded', function() {
+    window.formConfig = formConfig;
+});
+</script>
+
+{{ block.super }}
+{% endblock %}

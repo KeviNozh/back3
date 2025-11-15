@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Aeronave - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>✈️</span>
+    <span>Editar Aeronave</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Sección 1: Información Básica -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>📝</span>
+                <span>Información Básica</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Matrícula *</label>
+                    <input type="text" class="form-input" name="matricula" value="{{ aeronave.matricula }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo de Aeronave *</label>
+                    <input type="text" class="form-input" name="tipo_aeronave" value="{{ aeronave.tipo_aeronave }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Modelo *</label>
+                    <input type="text" class="form-input" name="modelo" value="{{ aeronave.modelo }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Capacidad (kg) *</label>
+                    <input type="number" class="form-input" name="capacidad_kg" value="{{ aeronave.capacidad_kg }}" required min="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 2: Asignaciones -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>👨‍✈️</span>
+                <span>Asignaciones</span>
+            </h3>
+            <div style="max-width: 400px;">
+                <div class="form-group">
+                    <label class="form-label">Piloto Asignado</label>
+                    <select class="form-select" name="piloto_asignado">
+                        <option value="">Sin asignar</option>
+                        {% for piloto in pilotos %}
+                        <option value="{{ piloto.id }}" {% if aeronave.piloto_asignado.id == piloto.id %}selected{% endif %}>
+                            {{ piloto.nombre }} ({{ piloto.certificacion }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 3: Estado -->
+        <div style="margin-bottom: 2.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🔄</span>
+                <span>Estado</span>
+            </h3>
+            <div class="form-group">
+                <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" name="activo" {% if aeronave.activo %}checked{% endif %}>
+                    <span>Activa</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Actualizar Aeronave</button>
+            <a href="{% url 'aeronaves' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .content-card > div > div {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

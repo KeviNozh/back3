@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Usuarios - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>👥</span>
+    <span>Gestión de Usuarios</span>
+</div>
+
+<div class="filters">
+    <input type="text" class="search-input" id="search-input" placeholder="Buscar usuarios..." value="{{ search_query }}">
+    <button class="btn" onclick="filterUsers()">🔍 Buscar</button>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">Lista de Usuarios</div>
+        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+            Total: {{ usuarios_con_perfiles|length }} usuarios
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Nombre Completo</th>
+                <th>Email</th>
+                <th>Tipo Usuario</th>
+                <th>Asignaciones</th>
+                <th>Estado</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in usuarios_con_perfiles %}
+            <tr>
+                <td>
+                    <strong>{{ item.usuario.username }}</strong>
+                    {% if item.usuario.is_superuser %}
+                    <span class="badge warning" title="Superusuario">👑</span>
+                    {% endif %}
+                </td>
+                <td>{{ item.usuario.get_full_name|default:"-" }}</td>
+                <td>{{ item.usuario.email }}</td>
+                <td>
+                    <span class="badge 
+                        {% if item.perfil.tipo_usuario == 'ADMIN' %}info
+                        {% elif item.perfil.tipo_usuario == 'CLIENTE' %}active
+                        {% elif item.perfil.tipo_usuario == 'CONDUCTOR' %}warning
+                        {% elif item.perfil.tipo_usuario == 'PILOTO' %}info{% endif %}">
+                        {{ item.perfil.get_tipo_usuario_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if item.perfil.conductor_asignado %}
+                    🚛 {{ item.perfil.conductor_asignado.nombre }}
+                    {% endif %}
+                    {% if item.perfil.piloto_asignado %}
+                    ✈️ {{ item.perfil.piloto_asignado.nombre }}
+                    {% endif %}
+                    {% if not item.perfil.conductor_asignado and not item.perfil.piloto_asignado %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge {% if item.usuario.is_active %}active{% else %}alert{% endif %}">
+                        {{ item.usuario.is_active|yesno:"Activo,Inactivo" }}
+                    </span>
+                </td>
+                <td>{{ item.usuario.date_joined|date:"d/m/Y" }}</td>
+                <td>
+                    <button class="action-btn" onclick="window.location.href='{% url 'editar_usuario' item.usuario.id %}'">
+                        Editar
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="loading">No se encontraron usuarios</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterUsers() {
+    const searchValue = document.getElementById('search-input').value;
+    window.location.href = `?search=${encodeURIComponent(searchValue)}`;
+}
+
+document.getElementById('search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        filterUsers();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rutas - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗺️</span>
+    <span>Gestión de Rutas</span>
+</div>
+
+<!-- BLOQUE DE PERMISOS PARA NO-ADMIN -->
+{% if user.is_authenticated and user.perfilusuario.tipo_usuario != 'ADMIN' and not user.is_superuser %}
+<div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+        <span>🔒</span>
+        <div>
+            <strong>Modo Solo Lectura</strong>
+            <div style="font-size: 0.9rem; opacity: 0.9;">
+                Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información de rutas.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Mensajes del sistema -->
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Filtros y Búsqueda -->
+<div class="filters">
+    <div class="filter-group">
+        <select class="filter-select" id="filter-transport">
+            <option value="">Todos los transportes</option>
+            <option value="TERRESTRE">Terrestre</option>
+            <option value="AEREO">Aéreo</option>
+        </select>
+        <select class="filter-select" id="filter-distance">
+            <option value="">Cualquier distancia</option>
+            <option value="0-100">0-100 km</option>
+            <option value="100-500">100-500 km</option>
+            <option value="500+">500+ km</option>
+        </select>
+    </div>
+    <input type="text" class="search-input" id="search-input" placeholder="Buscar por origen, destino...">
+    
+    {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+    <button class="btn" onclick="window.location.href='{% url 'ruta_create' %}'">➕ Nueva Ruta</button>
+    {% endif %}
+</div>
+
+<!-- Tabla de Rutas -->
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">Lista de Rutas</div>
+        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+            Total: {{ rutas.count }} rutas
+        </div>
+    </div>
+    
+    {% if rutas %}
+    <div style="overflow-x: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th>Tipo Transporte</th>
+                    <th>Distancia (km)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ruta in rutas %}
+                <tr>
+                    <td>{{ ruta.id }}</td>
+                    <td>{{ ruta.origen }}</td>
+                    <td>{{ ruta.destino }}</td>
+                    <td>
+                        <span class="badge {% if ruta.tipo_transporte == 'TERRESTRE' %}info{% else %}warning{% endif %}">
+                            {{ ruta.tipo_transporte }}
+                        </span>
+                    </td>
+                    <td>{{ ruta.distancia_km }}</td>
+                    <td>
+                        <button class="action-btn" onclick="window.location.href='{% url 'ruta_detail' ruta.pk %}'">Ver</button>
+                        {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+                        <button class="action-btn" onclick="window.location.href='{% url 'ruta_update' ruta.pk %}'">Editar</button>
+                        <button class="action-btn delete" onclick="confirmarEliminacion({{ ruta.pk }})">Eliminar</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
+        <h3>No hay rutas registradas</h3>
+        <p>No se han encontrado rutas en la base de datos.</p>
+        {% if user.is_superuser or user.perfilusuario.tipo_usuario == 'ADMIN' %}
+        <button class="btn" onclick="window.location.href='{% url 'ruta_create' %}'" style="margin-top: 1rem;">
+            ➕ Crear Primera Ruta
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Estadísticas -->
+<div class="stats-grid" style="margin-top: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">🚛</div>
+        <div>
+            <div class="stat-value">{{ rutas_terrestres.count }}</div>
+            <div class="stat-label">Rutas Terrestres</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--accent), var(--warning));">✈️</div>
+        <div>
+            <div class="stat-value">{{ rutas_aereas.count }}</div>
+            <div class="stat-label">Rutas Aéreas</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), #059669);">📏</div>
+        <div>
+            <div class="stat-value">{{ distancia_total|floatformat:0 }}</div>
+            <div class="stat-label">Km Totales</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, var(--info), #1d4ed8);">📍</div>
+        <div>
+            <div class="stat-value">{{ destinos_unicos }}</div>
+            <div class="stat-label">Destinos Únicos</div>
+        </div>
+    </div>
+</div>
+
+<style>
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-select, .search-input {
+    padding: 0.8rem 1.2rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    min-width: 180px;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 250px;
+}
+
+.table-container {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 1.2rem 1.5rem;
+    background: rgba(51, 65, 85, 0.3);
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+}
+
+.table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover {
+    background: rgba(51, 65, 85, 0.2);
+}
+
+.action-btn {
+    padding: 0.4rem 0.8rem;
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+}
+
+.action-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.action-btn.delete {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+.action-btn.delete:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.4));
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-select, .search-input {
+        min-width: 100%;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .table {
+        min-width: 600px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+function confirmarEliminacion(rutaId) {
+    if (confirm('¿Está seguro de que desea eliminar esta ruta? Esta acción no se puede deshacer.')) {
+        window.location.href = `/rutas/${rutaId}/eliminar/`;
+    }
+}
+
+// Filtros en el frontend
+document.addEventListener('DOMContentLoaded', function() {
+    const filterTransport = document.getElementById('filter-transport');
+    const filterDistance = document.getElementById('filter-distance');
+    const searchInput = document.getElementById('search-input');
+    
+    function aplicarFiltros() {
+        const rows = document.querySelectorAll('.table tbody tr');
+        const transportValue = filterTransport.value;
+        const distanceValue = filterDistance.value;
+        const searchValue = searchInput.value.toLowerCase();
+        
+        rows.forEach(row => {
+            let showRow = true;
+            const cells = row.querySelectorAll('td');
+            
+            // Filtro por tipo de transporte
+            if (transportValue && cells[3].textContent !== transportValue) {
+                showRow = false;
+            }
+            
+            // Filtro por distancia
+            if (distanceValue && showRow) {
+                const distancia = parseFloat(cells[4].textContent);
+                if (distanceValue === '0-100' && (distancia < 0 || distancia > 100)) {
+                    showRow = false;
+                } else if (distanceValue === '100-500' && (distancia <= 100 || distancia > 500)) {
+                    showRow = false;
+                } else if (distanceValue === '500+' && distancia <= 500) {
+                    showRow = false;
+                }
+            }
+            
+            // Filtro por búsqueda
+            if (searchValue && showRow) {
+                const textoFila = row.textContent.toLowerCase();
+                if (!textoFila.includes(searchValue)) {
+                    showRow = false;
+                }
+            }
+            
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+    
+    filterTransport.addEventListener('change', aplicarFiltros);
+    filterDistance.addEventListener('change', aplicarFiltros);
+    searchInput.addEventListener('input', aplicarFiltros);
+    
+    console.log('🗺️ Módulo de Rutas cargado exitosamente');
+});
+</script>
+{% endblock %}

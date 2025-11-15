@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Ruta - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🗑️</span>
+    <span>Eliminar Ruta</span>
+</div>
+
+<div class="content-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+        <h2 style="margin-bottom: 1rem;">¿Estás seguro de que deseas eliminar esta ruta?</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            Ruta: {{ object.origen }} - {{ object.destino }}<br>
+            Tipo: {{ object.get_tipo_transporte_display }}<br>
+            Esta acción no se puede deshacer.
+        </p>
+    </div>
+
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        <div class="action-buttons" style="justify-content: center;">
+            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            <a href="{% url 'ruta_detail' object.pk %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %} COnfirm

@@ -965,10 +965,10 @@
         }
 
         function deleteCargo(cargoId) {
-            if (confirm('¿Está seguro de que desea eliminar esta carga?')) {
-                window.location.href = `/cargas/${cargoId}/eliminar/`;
-            }
-        }
+    if (confirm('¿Está seguro de que desea eliminar esta carga?')) {
+        window.location.href = `/cargas/${cargoId}/eliminar/`;
+    }
+}
 
         // FUNCIONES NUEVAS PARA CREAR CARGAS
         async function loadClientesForSelect() {

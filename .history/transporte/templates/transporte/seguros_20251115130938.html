@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargas - Sistema de Gestión de Transporte</title>
+    <title>Seguros - Sistema de Gestión de Transporte</title>
     <style>
-        /* Todos los estilos del dashboard original */
+        /* MANTENER TODOS LOS ESTILOS ORIGINALES EXACTAMENTE IGUAL */
         * {
             margin: 0;
             padding: 0;
@@ -308,44 +308,34 @@
             font-weight: 600;
         }
 
-        .badge.entregado {
+        .badge.active {
             background: rgba(16, 185, 129, 0.2);
             color: var(--success);
         }
 
-        .badge.transito {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--info);
-        }
-
-        .badge.cargado {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
-        }
-
-        .badge.pendiente {
-            background: rgba(148, 163, 184, 0.2);
-            color: var(--text-secondary);
-        }
-
-        .badge.general {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--info);
-        }
-
-        .badge.peligrosa {
+        .badge.expired {
             background: rgba(239, 68, 68, 0.2);
             color: var(--danger);
         }
 
-        .badge.refrigerada {
-            background: rgba(14, 165, 233, 0.2);
-            color: #38bdf8;
+        .badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
         }
 
-        .badge.fragil {
+        .badge.vehiculo {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .badge.aeronave {
             background: rgba(139, 92, 246, 0.2);
             color: #a78bfa;
+        }
+
+        .badge.carga {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
         }
 
         .loading {
@@ -580,224 +570,208 @@
             <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
             <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
             <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
-            <div class="nav-item active" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
-            <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
             <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
             <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
         </div>
 
-        <!-- BLOQUE DE PERMISOS PARA NO-ADMIN -->
-        {% if user.is_authenticated and user.perfilusuario.tipo_usuario != 'ADMIN' %}
-        <style>
-            #new-cargo-btn,
-            .btn[onclick*="crear"],
-            .btn[onclick*="editar"],
-            .btn[onclick*="eliminar"],
-            .action-btn.delete,
-            .btn-danger {
-                display: none !important;
-            }
-        </style>
-        
-        <div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
-                <span>🔒</span>
-                <div>
-                    <strong>Modo Solo Lectura</strong>
-                    <div style="font-size: 0.9rem; opacity: 0.9;">
-                        Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información de cargas.
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Mensajes del sistema -->
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
-
         <div class="page-title">
-            <span>📦</span>
-            <span>Gestión de Cargas</span>
+            <span>🛡️</span>
+            <span>Gestión de Seguros</span>
         </div>
 
         <div class="filters">
             <div class="filter-group">
                 <select class="filter-select" id="filter-status">
                     <option value="">Todos los estados</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="cargado">Cargado</option>
-                    <option value="transito">En tránsito</option>
-                    <option value="entregado">Entregado</option>
+                    <option value="active">Vigente</option>
+                    <option value="warning">Por Vencer</option>
+                    <option value="expired">Vencido</option>
                 </select>
                 <select class="filter-select" id="filter-type">
                     <option value="">Todos los tipos</option>
-                    <option value="general">General</option>
-                    <option value="peligrosa">Peligrosa</option>
-                    <option value="refrigerada">Refrigerada</option>
-                    <option value="fragil">Frágil</option>
+                    <option value="vehiculo">Vehículo</option>
+                    <option value="aeronave">Aeronave</option>
+                    <option value="carga">Carga</option>
                 </select>
             </div>
-            <input type="text" class="search-input" id="search-input" placeholder="Buscar carga...">
-            <button class="btn" id="new-cargo-btn">➕ Nueva Carga</button>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar seguro...">
+            <button class="btn" id="new-insurance-btn">➕ Nuevo Seguro</button>
         </div>
 
         <div class="table-container">
             <div class="table-header">
-                <div class="table-title">Lista de Cargas</div>
-                <div id="cargo-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+                <div class="table-title">Lista de Seguros</div>
+                <div id="insurance-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
             </div>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID Carga</th>
-                        <th>Descripción</th>
-                        <th>Tipo</th>
-                        <th>Peso (kg)</th>
-                        <th>Volumen (m³)</th>
-                        <th>Valor Declarado</th>
-                        <th>Cliente</th>
+                        <th>N° Póliza</th>
+                        <th>Tipo de Seguro</th>
+                        <th>Aseguradora</th>
+                        <th>Cobertura</th>
+                        <th>Vigencia Desde</th>
+                        <th>Vigencia Hasta</th>
                         <th>Estado</th>
+                        <th>Asegurado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="cargos-table-body">
+                <tbody id="insurances-table-body">
                     <tr>
-                        <td colspan="9" class="loading">Cargando datos de cargas desde la base de datos...</td>
+                        <td colspan="9" class="loading">Cargando datos de seguros desde la base de datos...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="newCargaModal" class="modal">
+    <!-- Modal para crear nuevo seguro -->
+    <div id="newInsuranceModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('newCargaModal')">&times;</span>
-            <h3>Nueva Carga</h3>
-            <form id="newCargaForm">
-                <div class="form-group">
-                    <label class="form-label">Descripción</label>
-                    <input type="text" class="form-input" name="descripcion" required>
-                </div>
+            <span class="close-modal" onclick="closeModal('newInsuranceModal')">&times;</span>
+            <h3>Nuevo Seguro</h3>
+            <form id="newInsuranceForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Tipo de Carga</label>
-                        <select class="form-select" name="tipo_carga" required>
+                        <label class="form-label">Número de Póliza</label>
+                        <input type="text" class="form-input" name="numero_poliza" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Seguro</label>
+                        <select class="form-select" name="tipo_seguro" required>
                             <option value="">Seleccionar tipo</option>
-                            <option value="General">General</option>
-                            <option value="Peligrosa">Peligrosa</option>
-                            <option value="Refrigerada">Refrigerada</option>
-                            <option value="Frágil">Frágil</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Cliente</label>
-                        <select class="form-select" name="cliente" id="cliente-select" required>
-                            <option value="">Seleccionar cliente</option>
-                            <!-- Los clientes se cargarán dinámicamente -->
+                            <option value="Vehículo">Vehículo</option>
+                            <option value="Aeronave">Aeronave</option>
+                            <option value="Carga">Carga</option>
+                            <option value="Responsabilidad Civil">Responsabilidad Civil</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Peso (kg)</label>
-                        <input type="number" class="form-input" name="peso_kg" step="0.01" required min="0">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Volumen (m³)</label>
-                        <input type="number" class="form-input" name="volumen_m3" step="0.01" required min="0">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Valor Declarado</label>
-                        <input type="number" class="form-input" name="valor_declarado" step="0.01" placeholder="$" required min="0">
-                    </div>
-                </div>
+                
                 <div class="form-group">
-                    <label class="form-label">Notas Especiales</label>
-                    <textarea class="form-input" name="notas_especiales" rows="3"></textarea>
+                    <label class="form-label">Aseguradora</label>
+                    <input type="text" class="form-input" name="aseguradora" required>
                 </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Cobertura ($)</label>
+                        <input type="number" class="form-input" name="cobertura" step="0.01" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select class="form-select" name="estado" required>
+                            <option value="Vigente">Vigente</option>
+                            <option value="Por Vencer">Por Vencer</option>
+                            <option value="Vencido">Vencido</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Vigencia Desde</label>
+                        <input type="date" class="form-input" name="vigencia_desde" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Vigencia Hasta</label>
+                        <input type="date" class="form-input" name="vigencia_hasta" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Vehículo Asegurado</label>
+                        <select class="form-select" name="vehiculo" id="vehiculo-select">
+                            <option value="">No aplica</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Aeronave Asegurada</label>
+                        <select class="form-select" name="aeronave" id="aeronave-select">
+                            <option value="">No aplica</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('newCargaModal')">Cancelar</button>
-                    <button type="submit" class="btn">Crear Carga</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newInsuranceModal')">Cancelar</button>
+                    <button type="submit" class="btn">Crear Seguro</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="viewCargaModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('viewCargaModal')">&times;</span>
-            <h3 id="viewCargaTitle">Detalles de la Carga</h3>
-            <div id="viewCargaContent"></div>
-        </div>
-    </div>
-
     <script>
-        // Variable global para almacenar las cargas
-        let cargosData = [];
+        // Variable global para almacenar los seguros
+        let insurancesData = [];
 
-        // Función para cargar cargas desde la base de datos
-        async function loadCargosFromDatabase() {
+        // Función para cargar seguros desde la base de datos
+        async function loadInsurancesFromDatabase() {
             try {
                 showLoadingState();
                 
-                const response = await fetch('/api/cargas/');
+                const response = await fetch('/api/seguros/');
                 
                 if (!response.ok) {
-                    throw new Error('Error al cargar las cargas');
+                    throw new Error('Error al cargar los seguros');
                 }
                 
-                cargosData = await response.json();
-                renderCargosTable(cargosData);
-                showNotification('Datos de cargas cargados correctamente');
+                insurancesData = await response.json();
+                renderInsurancesTable(insurancesData);
+                showNotification('Datos de seguros cargados correctamente');
                 
             } catch (error) {
                 console.error('Error:', error);
-                showErrorState('Error al cargar las cargas: ' + error.message);
+                showErrorState('Error al cargar los seguros: ' + error.message);
             }
         }
 
         // Función para mostrar estado de carga
         function showLoadingState() {
-            const tableBody = document.getElementById('cargos-table-body');
+            const tableBody = document.getElementById('insurances-table-body');
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="9" class="loading">Cargando datos de cargas desde la base de datos...</td>
+                    <td colspan="9" class="loading">Cargando datos de seguros desde la base de datos...</td>
                 </tr>
             `;
-            document.getElementById('cargo-count').textContent = 'Cargando...';
+            document.getElementById('insurance-count').textContent = 'Cargando...';
         }
 
         // Función para mostrar estado de error
         function showErrorState(message) {
-            const tableBody = document.getElementById('cargos-table-body');
+            const tableBody = document.getElementById('insurances-table-body');
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="9">
                         <div class="error">
                             ${message}
                             <br>
-                            <button class="btn" onclick="loadCargosFromDatabase()" style="margin-top: 1rem;">
+                            <button class="btn" onclick="loadInsurancesFromDatabase()" style="margin-top: 1rem;">
                                 Reintentar
                             </button>
                         </div>
                     </td>
                 </tr>
             `;
-            document.getElementById('cargo-count').textContent = 'Error';
+            document.getElementById('insurance-count').textContent = 'Error';
         }
 
-        // Función para simular estado (ya que no existe en el modelo Carga)
-        function getCargoStatus(cargoId) {
-            const statuses = ['pendiente', 'cargado', 'transito', 'entregado'];
-            return statuses[cargoId % statuses.length];
+        // Función para determinar estado del seguro
+        function getInsuranceStatus(vigenciaHasta) {
+            if (!vigenciaHasta) return 'expired';
+            
+            const today = new Date();
+            const endDate = new Date(vigenciaHasta);
+            const daysDiff = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysDiff < 0) return 'expired';
+            if (daysDiff <= 30) return 'warning';
+            return 'active';
         }
 
         // Función para formatear moneda
@@ -809,92 +783,93 @@
             }).format(amount);
         }
 
-        // Función para renderizar la tabla de cargas
-        function renderCargosTable(cargos) {
-            const tableBody = document.getElementById('cargos-table-body');
-            const cargoCount = document.getElementById('cargo-count');
+        // Función para formatear fecha
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        // Función para renderizar la tabla de seguros
+        function renderInsurancesTable(insurances) {
+            const tableBody = document.getElementById('insurances-table-body');
+            const insuranceCount = document.getElementById('insurance-count');
             
-            if (cargos.length === 0) {
+            if (insurances.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="loading">No se encontraron cargas en la base de datos</td>
+                        <td colspan="9" class="loading">No se encontraron seguros en la base de datos</td>
                     </tr>
                 `;
-                cargoCount.textContent = 'Total: 0 cargas';
+                insuranceCount.textContent = 'Total: 0 seguros';
                 return;
             }
             
             tableBody.innerHTML = '';
-            cargoCount.textContent = `Total: ${cargos.length} cargas`;
+            insuranceCount.textContent = `Total: ${insurances.length} seguros`;
             
-            cargos.forEach(cargo => {
+            insurances.forEach(insurance => {
                 const row = document.createElement('tr');
                 
-                // USAR CAMPOS REALES DE LA BASE DE DATOS
-                const status = getCargoStatus(cargo.id); // Estado simulado
+                // Determinar estado del seguro
+                const status = getInsuranceStatus(insurance.vigencia_hasta);
                 
                 let statusClass = '';
                 let statusText = '';
                 
                 switch (status) {
-                    case 'entregado':
-                        statusClass = 'entregado';
-                        statusText = 'Entregado';
+                    case 'active':
+                        statusClass = 'active';
+                        statusText = 'Vigente';
                         break;
-                    case 'transito':
-                        statusClass = 'transito';
-                        statusText = 'En tránsito';
+                    case 'warning':
+                        statusClass = 'warning';
+                        statusText = 'Por Vencer';
                         break;
-                    case 'cargado':
-                        statusClass = 'cargado';
-                        statusText = 'Cargado';
-                        break;
-                    case 'pendiente':
-                        statusClass = 'pendiente';
-                        statusText = 'Pendiente';
+                    case 'expired':
+                        statusClass = 'expired';
+                        statusText = 'Vencido';
                         break;
                     default:
-                        statusClass = 'pendiente';
-                        statusText = 'Pendiente';
+                        statusClass = 'active';
+                        statusText = insurance.estado || 'Vigente';
                 }
 
-                // Tipo basado en campo real 'tipo_carga'
+                // Tipo de seguro
                 let typeClass = '';
-                let typeText = cargo.tipo_carga || 'General';
+                let typeText = insurance.tipo_seguro || 'N/A';
                 
-                switch (cargo.tipo_carga?.toLowerCase()) {
-                    case 'peligrosa':
-                        typeClass = 'peligrosa';
-                        break;
-                    case 'refrigerada':
-                        typeClass = 'refrigerada';
-                        break;
-                    case 'frágil':
-                    case 'fragil':
-                        typeClass = 'fragil';
-                        break;
-                    default:
-                        typeClass = 'general';
+                if (typeText.toLowerCase().includes('vehículo') || typeText.toLowerCase().includes('vehiculo')) {
+                    typeClass = 'vehiculo';
+                } else if (typeText.toLowerCase().includes('aeronave')) {
+                    typeClass = 'aeronave';
+                } else if (typeText.toLowerCase().includes('carga')) {
+                    typeClass = 'carga';
+                } else {
+                    typeClass = 'vehiculo';
+                }
+
+                // Asegurado
+                let insuredItem = 'N/A';
+                if (insurance.vehiculo) {
+                    insuredItem = insurance.vehiculo_patente || insurance.vehiculo.patente || 'Vehículo';
+                } else if (insurance.aeronave) {
+                    insuredItem = insurance.aeronave_matricula || insurance.aeronave.matricula || 'Aeronave';
                 }
                 
-                // Obtener nombre del cliente
-                const clienteNombre = cargo.cliente ? 
-                    (cargo.cliente_razon_social || cargo.cliente.razon_social || 'Cliente') : 
-                    'N/A';
-                
                 row.innerHTML = `
-                    <td>${cargo.id || 'N/A'}</td>
-                    <td>${cargo.descripcion || 'N/A'}</td>
+                    <td>${insurance.numero_poliza || 'N/A'}</td>
                     <td><span class="badge ${typeClass}">${typeText}</span></td>
-                    <td>${cargo.peso_kg ? cargo.peso_kg + ' kg' : 'N/A'}</td>
-                    <td>${cargo.volumen_m3 ? cargo.volumen_m3 + ' m³' : 'N/A'}</td>
-                    <td>${formatCurrency(cargo.valor_declarado)}</td>
-                    <td>${clienteNombre}</td>
+                    <td>${insurance.aseguradora || 'N/A'}</td>
+                    <td>${formatCurrency(insurance.cobertura)}</td>
+                    <td>${formatDate(insurance.vigencia_desde)}</td>
+                    <td>${formatDate(insurance.vigencia_hasta)}</td>
                     <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>${insuredItem}</td>
                     <td>
-                        <button class="action-btn" onclick="viewCargo(${cargo.id})">Ver</button>
-                        <button class="action-btn" onclick="window.location.href='/cargas/${cargo.id}/editar/'">Editar</button>
-                        <button class="action-btn delete" onclick="deleteCargo(${cargo.id})">Eliminar</button>
+                        <button class="action-btn" onclick="viewInsurance(${insurance.id})">Ver</button>
+                        <button class="action-btn" onclick="window.location.href='/seguros/${insurance.id}/editar/'">Editar</button>
+                        <button class="action-btn delete" onclick="deleteInsurance(${insurance.id})">Eliminar</button>
                     </td>
                 `;
                 
@@ -902,111 +877,141 @@
             });
         }
 
-        // Función para filtrar cargas
-        function filterCargos() {
+        // Función para filtrar seguros
+        function filterInsurances() {
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
             const searchText = document.getElementById('search-input').value.toLowerCase();
             
-            const filteredCargos = cargosData.filter(cargo => {
-                // Estado simulado
-                const status = getCargoStatus(cargo.id);
-                const matchesStatus = !statusFilter || status === statusFilter;
+            const filteredInsurances = insurancesData.filter(insurance => {
+                // Filtro por estado
+                const status = getInsuranceStatus(insurance.vigencia_hasta);
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && status === 'active') ||
+                    (statusFilter === 'warning' && status === 'warning') ||
+                    (statusFilter === 'expired' && status === 'expired');
                 
-                // Tipo real
+                // Filtro por tipo
                 const matchesType = !typeFilter || 
-                    (cargo.tipo_carga && cargo.tipo_carga.toLowerCase().includes(typeFilter.toLowerCase()));
+                    (typeFilter === 'vehiculo' && insurance.tipo_seguro && insurance.tipo_seguro.toLowerCase().includes('vehículo')) ||
+                    (typeFilter === 'aeronave' && insurance.tipo_seguro && insurance.tipo_seguro.toLowerCase().includes('aeronave')) ||
+                    (typeFilter === 'carga' && insurance.tipo_seguro && insurance.tipo_seguro.toLowerCase().includes('carga'));
                 
-                // Búsqueda
+                // Filtro por búsqueda
                 const matchesSearch = !searchText || 
-                    (cargo.descripcion && cargo.descripcion.toLowerCase().includes(searchText)) ||
-                    (cargo.cliente_razon_social && cargo.cliente_razon_social.toLowerCase().includes(searchText)) ||
-                    (cargo.id && cargo.id.toString().includes(searchText));
+                    (insurance.numero_poliza && insurance.numero_poliza.toLowerCase().includes(searchText)) ||
+                    (insurance.aseguradora && insurance.aseguradora.toLowerCase().includes(searchText)) ||
+                    (insurance.tipo_seguro && insurance.tipo_seguro.toLowerCase().includes(searchText));
                 
                 return matchesStatus && matchesType && matchesSearch;
             });
             
-            renderCargosTable(filteredCargos);
+            renderInsurancesTable(filteredInsurances);
         }
 
-        // Funciones de acción para las cargas
-        async function viewCargo(cargoId) {
+        // Funciones de acción para los seguros
+        async function viewInsurance(insuranceId) {
             try {
-                const response = await fetch(`/api/cargas/${cargoId}/`);
-                const cargoDetails = await response.json();
+                const response = await fetch(`/api/seguros/${insuranceId}/`);
+                const insuranceDetails = await response.json();
                 
-                showNotification(`Viendo detalles de la carga ${cargoId}`);
-                
-                // Mostrar detalles en modal
-                document.getElementById('viewCargaTitle').textContent = `Detalles de Carga #${cargoId}`;
-                document.getElementById('viewCargaContent').innerHTML = `
-                    <div style="display: grid; gap: 1rem;">
-                        <div><strong>Descripción:</strong> ${cargoDetails.descripcion || 'N/A'}</div>
-                        <div><strong>Tipo:</strong> ${cargoDetails.tipo_carga || 'N/A'}</div>
-                        <div><strong>Peso:</strong> ${cargoDetails.peso_kg || 'N/A'} kg</div>
-                        <div><strong>Volumen:</strong> ${cargoDetails.volumen_m3 || 'N/A'} m³</div>
-                        <div><strong>Valor Declarado:</strong> ${formatCurrency(cargoDetails.valor_declarado)}</div>
-                        <div><strong>Cliente:</strong> ${cargoDetails.cliente_razon_social || 'N/A'}</div>
-                        <div><strong>Notas:</strong> ${cargoDetails.notas_especiales || 'Sin notas especiales'}</div>
-                    </div>
-                `;
-                showModal('viewCargaModal');
+                showNotification(`Viendo detalles del seguro ${insuranceId}`);
+                console.log('Detalles del seguro:', insuranceDetails);
                 
             } catch (error) {
                 console.error('Error al obtener detalles:', error);
-                showNotification('Error al cargar detalles de la carga');
+                showNotification('Error al cargar detalles del seguro');
             }
         }
 
-        async function editCargo(cargoId) {
-            showNotification(`Editando la carga ${cargoId}`);
-            // Redirigir a página de edición
-            window.location.href = `/cargas/${cargoId}/editar/`;
+        
+            if (confirm('¿Está seguro de que desea eliminar este seguro?')) {
+                try {
+                    const response = await fetch(`/api/seguros/${insuranceId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        await loadInsurancesFromDatabase();
+                        showNotification('Seguro eliminado correctamente');
+                    } else {
+                        throw new Error('Error al eliminar el seguro');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar el seguro');
+                }
+            }async function deleteInsurance(insuranceId) {
         }
 
-        function deleteCargo(cargoId) {
-            if (confirm('¿Está seguro de que desea eliminar esta carga?')) {
-                window.location.href = `/cargas/${cargoId}/eliminar/`;
-            }
+        // Funciones para el modal de nuevo seguro
+        async function showNewInsuranceModal() {
+            await loadVehiclesForSelect();
+            await loadAircraftForSelect();
+            showModal('newInsuranceModal');
         }
 
-        // FUNCIONES NUEVAS PARA CREAR CARGAS
-        async function loadClientesForSelect() {
+        async function loadVehiclesForSelect() {
             try {
-                const response = await fetch('/api/clientes/');
+                const response = await fetch('/api/vehiculos/');
                 if (response.ok) {
-                    const clientes = await response.json();
-                    const select = document.getElementById('cliente-select');
+                    const vehicles = await response.json();
+                    const select = document.getElementById('vehiculo-select');
                     
                     // Limpiar opciones excepto la primera
                     while (select.children.length > 1) {
                         select.removeChild(select.lastChild);
                     }
                     
-                    // Agregar clientes activos
-                    clientes.forEach(cliente => {
-                        if (cliente.activo) {
+                    // Agregar vehículos activos
+                    vehicles.forEach(vehicle => {
+                        if (vehicle.activo) {
                             const option = document.createElement('option');
-                            option.value = cliente.id;
-                            option.textContent = cliente.razon_social || cliente.nombre || `Cliente ${cliente.id}`;
+                            option.value = vehicle.id;
+                            option.textContent = `${vehicle.patente} - ${vehicle.modelo}`;
                             select.appendChild(option);
                         }
                     });
                 }
             } catch (error) {
-                console.error('Error al cargar clientes:', error);
-                // Si hay error, mostrar opciones de ejemplo
-                const select = document.getElementById('cliente-select');
-                const option = document.createElement('option');
-                option.value = "1";
-                option.textContent = "Cliente de Ejemplo";
-                select.appendChild(option);
+                console.error('Error al cargar vehículos:', error);
             }
         }
 
-        async function createCarga(formData) {
+        async function loadAircraftForSelect() {
             try {
-                const response = await fetch('/api/cargas/', {
+                const response = await fetch('/api/aeronaves/');
+                if (response.ok) {
+                    const aircrafts = await response.json();
+                    const select = document.getElementById('aeronave-select');
+                    
+                    // Limpiar opciones excepto la primera
+                    while (select.children.length > 1) {
+                        select.removeChild(select.lastChild);
+                    }
+                    
+                    // Agregar aeronaves activas
+                    aircrafts.forEach(aircraft => {
+                        if (aircraft.activo) {
+                            const option = document.createElement('option');
+                            option.value = aircraft.id;
+                            option.textContent = `${aircraft.matricula} - ${aircraft.modelo}`;
+                            select.appendChild(option);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar aeronaves:', error);
+            }
+        }
+
+        async function createInsurance(formData) {
+            try {
+                const response = await fetch('/api/seguros/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1016,42 +1021,51 @@
                 });
                 
                 if (response.ok) {
-                    const newCarga = await response.json();
-                    showNotification('Carga creada exitosamente');
-                    closeModal('newCargaModal');
-                    await loadCargosFromDatabase(); // Recargar la lista
-                    return newCarga;
+                    const newInsurance = await response.json();
+                    showNotification('Seguro creado exitosamente');
+                    closeModal('newInsuranceModal');
+                    await loadInsurancesFromDatabase();
+                    return newInsurance;
                 } else {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Error al crear la carga');
+                    throw new Error(errorData.detail || 'Error al crear el seguro');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification('Error al crear la carga: ' + error.message);
+                showNotification('Error al crear el seguro: ' + error.message);
                 throw error;
             }
         }
 
-        function handleCargaFormSubmit(e) {
+        function handleInsuranceFormSubmit(e) {
             e.preventDefault();
             
-            const form = e.target;
             const formData = {
-                descripcion: form.querySelector('input[name="descripcion"]').value,
-                tipo_carga: form.querySelector('select[name="tipo_carga"]').value,
-                peso_kg: parseFloat(form.querySelector('input[name="peso_kg"]').value),
-                volumen_m3: parseFloat(form.querySelector('input[name="volumen_m3"]').value),
-                valor_declarado: parseFloat(form.querySelector('input[name="valor_declarado"]').value),
-                cliente: form.querySelector('select[name="cliente"]').value,
-                notas_especiales: form.querySelector('textarea[name="notas_especiales"]').value
+                numero_poliza: document.querySelector('input[name="numero_poliza"]').value,
+                tipo_seguro: document.querySelector('select[name="tipo_seguro"]').value,
+                aseguradora: document.querySelector('input[name="aseguradora"]').value,
+                cobertura: parseFloat(document.querySelector('input[name="cobertura"]').value),
+                estado: document.querySelector('select[name="estado"]').value,
+                vigencia_desde: document.querySelector('input[name="vigencia_desde"]').value,
+                vigencia_hasta: document.querySelector('input[name="vigencia_hasta"]').value,
+                vehiculo: document.querySelector('select[name="vehiculo"]').value || null,
+                aeronave: document.querySelector('select[name="aeronave"]').value || null
             };
             
-            createCarga(formData);
+            createInsurance(formData);
         }
 
-        async function showNewCargaModal() {
-            await loadClientesForSelect();
-            showModal('newCargaModal');
+        // Funciones auxiliares para modals
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Resetear formulario
+            if (modalId === 'newInsuranceModal') {
+                document.getElementById('newInsuranceForm').reset();
+            }
         }
 
         // Función auxiliar para obtener el token CSRF
@@ -1071,20 +1085,7 @@
             return cookieValue;
         }
 
-        // Modal Functions
-        function showModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            // Resetear formulario
-            if (modalId === 'newCargaModal') {
-                document.getElementById('newCargaForm').reset();
-            }
-        }
-
-        // Notification System
+        // Función para mostrar notificaciones
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.textContent = `✓ ${message}`;
@@ -1112,19 +1113,17 @@
 
         // Inicialización cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
-            loadCargosFromDatabase();
+            loadInsurancesFromDatabase();
             
-            document.getElementById('filter-status').addEventListener('change', filterCargos);
-            document.getElementById('filter-type').addEventListener('change', filterCargos);
-            document.getElementById('search-input').addEventListener('input', filterCargos);
+            document.getElementById('filter-status').addEventListener('change', filterInsurances);
+            document.getElementById('filter-type').addEventListener('change', filterInsurances);
+            document.getElementById('search-input').addEventListener('input', filterInsurances);
             
-            // Actualizado para abrir el modal y cargar clientes
-            document.getElementById('new-cargo-btn').addEventListener('click', showNewCargaModal);
+            document.getElementById('new-insurance-btn').addEventListener('click', showNewInsuranceModal);
             
-            // Agregar event listener para el formulario
-            document.getElementById('newCargaForm').addEventListener('submit', handleCargaFormSubmit);
+            document.getElementById('newInsuranceForm').addEventListener('submit', handleInsuranceFormSubmit);
             
-            console.log('📦 Módulo de Cargas cargado exitosamente');
+            console.log('🛡️ Módulo de Seguros cargado exitosamente');
         });
 
         // Estilos para las animaciones de notificaciones

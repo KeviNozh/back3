@@ -9,7 +9,7 @@ class PermisosMiddleware:
         response = self.get_response(request)
         return response
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+     def process_view(self, request, view_func, view_args, view_kwargs):
         # ✅ PERMITIR ACCESO COMPLETO A SUPERUSUARIOS Y STAFF
         if request.user.is_authenticated and (request.user.is_superuser or request.user.is_staff):
             return None

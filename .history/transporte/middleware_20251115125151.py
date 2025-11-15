@@ -24,20 +24,12 @@ class PermisosMiddleware:
         if request.resolver_match.url_name in urls_publicas:
             return None
 
-        # Obtener el tipo de usuario - MEJORADO
+        # Obtener el tipo de usuario
         try:
             if hasattr(request.user, 'perfilusuario'):
                 tipo_usuario = request.user.perfilusuario.tipo_usuario
-            elif request.user.is_superuser:
-                # Si es superusuario y no tiene perfil, crear uno automáticamente
-                from .models import PerfilUsuario
-                perfil, created = PerfilUsuario.objects.get_or_create(
-                    usuario=request.user,
-                    defaults={'tipo_usuario': 'ADMIN'}
-                )
-                tipo_usuario = 'ADMIN'
             else:
-                # Si no tiene perfil y no es superusuario, crear uno por defecto
+                # Si no tiene perfil, crear uno por defecto
                 from .models import PerfilUsuario
                 perfil, created = PerfilUsuario.objects.get_or_create(
                     usuario=request.user,

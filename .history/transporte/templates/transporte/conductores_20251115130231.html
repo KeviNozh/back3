@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargas - Sistema de Gestión de Transporte</title>
+    <title>Conductores - Sistema de Gestión de Transporte</title>
     <style>
-        /* Todos los estilos del dashboard original */
+        /* MANTENER TODOS LOS ESTILOS ORIGINALES EXACTAMENTE IGUAL */
         * {
             margin: 0;
             padding: 0;
@@ -308,44 +308,19 @@
             font-weight: 600;
         }
 
-        .badge.entregado {
+        .badge.active {
             background: rgba(16, 185, 129, 0.2);
             color: var(--success);
         }
 
-        .badge.transito {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--info);
-        }
-
-        .badge.cargado {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
-        }
-
-        .badge.pendiente {
-            background: rgba(148, 163, 184, 0.2);
-            color: var(--text-secondary);
-        }
-
-        .badge.general {
-            background: rgba(59, 130, 246, 0.2);
-            color: var(--info);
-        }
-
-        .badge.peligrosa {
+        .badge.inactive {
             background: rgba(239, 68, 68, 0.2);
             color: var(--danger);
         }
 
-        .badge.refrigerada {
-            background: rgba(14, 165, 233, 0.2);
-            color: #38bdf8;
-        }
-
-        .badge.fragil {
-            background: rgba(139, 92, 246, 0.2);
-            color: #a78bfa;
+        .badge.vacation {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
         }
 
         .loading {
@@ -577,324 +552,212 @@
             <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
             <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
             <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
-            <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
             <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
             <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
-            <div class="nav-item active" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
             <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
             <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
             <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
         </div>
 
-        <!-- BLOQUE DE PERMISOS PARA NO-ADMIN -->
-        {% if user.is_authenticated and user.perfilusuario.tipo_usuario != 'ADMIN' %}
-        <style>
-            #new-cargo-btn,
-            .btn[onclick*="crear"],
-            .btn[onclick*="editar"],
-            .btn[onclick*="eliminar"],
-            .action-btn.delete,
-            .btn-danger {
-                display: none !important;
-            }
-        </style>
-        
-        <div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
-                <span>🔒</span>
-                <div>
-                    <strong>Modo Solo Lectura</strong>
-                    <div style="font-size: 0.9rem; opacity: 0.9;">
-                        Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información de cargas.
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Mensajes del sistema -->
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
-
         <div class="page-title">
-            <span>📦</span>
-            <span>Gestión de Cargas</span>
+            <span>👨‍💼</span>
+            <span>Gestión de Conductores</span>
         </div>
 
         <div class="filters">
             <div class="filter-group">
                 <select class="filter-select" id="filter-status">
                     <option value="">Todos los estados</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="cargado">Cargado</option>
-                    <option value="transito">En tránsito</option>
-                    <option value="entregado">Entregado</option>
-                </select>
-                <select class="filter-select" id="filter-type">
-                    <option value="">Todos los tipos</option>
-                    <option value="general">General</option>
-                    <option value="peligrosa">Peligrosa</option>
-                    <option value="refrigerada">Refrigerada</option>
-                    <option value="fragil">Frágil</option>
+                    <option value="active">Activo</option>
+                    <option value="inactive">Inactivo</option>
+                    <option value="vacation">Vacaciones</option>
                 </select>
             </div>
-            <input type="text" class="search-input" id="search-input" placeholder="Buscar carga...">
-            <button class="btn" id="new-cargo-btn">➕ Nueva Carga</button>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar conductor...">
+            <button class="btn" id="new-driver-btn">➕ Nuevo Conductor</button>
         </div>
 
         <div class="table-container">
             <div class="table-header">
-                <div class="table-title">Lista de Cargas</div>
-                <div id="cargo-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+                <div class="table-title">Lista de Conductores</div>
+                <div id="driver-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
             </div>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID Carga</th>
-                        <th>Descripción</th>
-                        <th>Tipo</th>
-                        <th>Peso (kg)</th>
-                        <th>Volumen (m³)</th>
-                        <th>Valor Declarado</th>
-                        <th>Cliente</th>
+                        <th>Nombre</th>
+                        <th>RUT</th>
+                        <th>Licencia</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Vehículo Asignado</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="cargos-table-body">
+                <tbody id="drivers-table-body">
                     <tr>
-                        <td colspan="9" class="loading">Cargando datos de cargas desde la base de datos...</td>
+                        <td colspan="8" class="loading">Cargando datos de conductores desde la base de datos...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="newCargaModal" class="modal">
+    <!-- Modal para crear nuevo conductor -->
+    <div id="newDriverModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('newCargaModal')">&times;</span>
-            <h3>Nueva Carga</h3>
-            <form id="newCargaForm">
+            <span class="close-modal" onclick="closeModal('newDriverModal')">&times;</span>
+            <h3>Nuevo Conductor</h3>
+            <form id="newDriverForm">
                 <div class="form-group">
-                    <label class="form-label">Descripción</label>
-                    <input type="text" class="form-input" name="descripcion" required>
+                    <label class="form-label">Nombre Completo</label>
+                    <input type="text" class="form-input" name="nombre" required>
                 </div>
+                
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Tipo de Carga</label>
-                        <select class="form-select" name="tipo_carga" required>
-                            <option value="">Seleccionar tipo</option>
-                            <option value="General">General</option>
-                            <option value="Peligrosa">Peligrosa</option>
-                            <option value="Refrigerada">Refrigerada</option>
-                            <option value="Frágil">Frágil</option>
-                        </select>
+                        <label class="form-label">RUT</label>
+                        <input type="text" class="form-input" name="rut" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Cliente</label>
-                        <select class="form-select" name="cliente" id="cliente-select" required>
-                            <option value="">Seleccionar cliente</option>
-                            <!-- Los clientes se cargarán dinámicamente -->
-                        </select>
+                        <label class="form-label">Licencia</label>
+                        <input type="text" class="form-input" name="licencia" required>
                     </div>
                 </div>
+                
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Peso (kg)</label>
-                        <input type="number" class="form-input" name="peso_kg" step="0.01" required min="0">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-input" name="telefono" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Volumen (m³)</label>
-                        <input type="number" class="form-input" name="volumen_m3" step="0.01" required min="0">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" name="email" required>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Valor Declarado</label>
-                        <input type="number" class="form-input" name="valor_declarado" step="0.01" placeholder="$" required min="0">
-                    </div>
-                </div>
+                
                 <div class="form-group">
-                    <label class="form-label">Notas Especiales</label>
-                    <textarea class="form-input" name="notas_especiales" rows="3"></textarea>
+                    <label class="form-label">
+                        <input type="checkbox" name="activo" checked> Activo
+                    </label>
                 </div>
+                
                 <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('newCargaModal')">Cancelar</button>
-                    <button type="submit" class="btn">Crear Carga</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newDriverModal')">Cancelar</button>
+                    <button type="submit" class="btn">Crear Conductor</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="viewCargaModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('viewCargaModal')">&times;</span>
-            <h3 id="viewCargaTitle">Detalles de la Carga</h3>
-            <div id="viewCargaContent"></div>
-        </div>
-    </div>
-
     <script>
-        // Variable global para almacenar las cargas
-        let cargosData = [];
+        // Variable global para almacenar los conductores
+        let driversData = [];
 
-        // Función para cargar cargas desde la base de datos
-        async function loadCargosFromDatabase() {
+        // Función para cargar conductores desde la base de datos
+        async function loadDriversFromDatabase() {
             try {
                 showLoadingState();
                 
-                const response = await fetch('/api/cargas/');
+                const response = await fetch('/api/conductores/');
                 
                 if (!response.ok) {
-                    throw new Error('Error al cargar las cargas');
+                    throw new Error('Error al cargar los conductores');
                 }
                 
-                cargosData = await response.json();
-                renderCargosTable(cargosData);
-                showNotification('Datos de cargas cargados correctamente');
+                driversData = await response.json();
+                renderDriversTable(driversData);
+                showNotification('Datos de conductores cargados correctamente');
                 
             } catch (error) {
                 console.error('Error:', error);
-                showErrorState('Error al cargar las cargas: ' + error.message);
+                showErrorState('Error al cargar los conductores: ' + error.message);
             }
         }
 
         // Función para mostrar estado de carga
         function showLoadingState() {
-            const tableBody = document.getElementById('cargos-table-body');
+            const tableBody = document.getElementById('drivers-table-body');
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="9" class="loading">Cargando datos de cargas desde la base de datos...</td>
+                    <td colspan="8" class="loading">Cargando datos de conductores desde la base de datos...</td>
                 </tr>
             `;
-            document.getElementById('cargo-count').textContent = 'Cargando...';
+            document.getElementById('driver-count').textContent = 'Cargando...';
         }
 
         // Función para mostrar estado de error
         function showErrorState(message) {
-            const tableBody = document.getElementById('cargos-table-body');
+            const tableBody = document.getElementById('drivers-table-body');
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="9">
+                    <td colspan="8">
                         <div class="error">
                             ${message}
                             <br>
-                            <button class="btn" onclick="loadCargosFromDatabase()" style="margin-top: 1rem;">
+                            <button class="btn" onclick="loadDriversFromDatabase()" style="margin-top: 1rem;">
                                 Reintentar
                             </button>
                         </div>
                     </td>
                 </tr>
             `;
-            document.getElementById('cargo-count').textContent = 'Error';
+            document.getElementById('driver-count').textContent = 'Error';
         }
 
-        // Función para simular estado (ya que no existe en el modelo Carga)
-        function getCargoStatus(cargoId) {
-            const statuses = ['pendiente', 'cargado', 'transito', 'entregado'];
-            return statuses[cargoId % statuses.length];
-        }
-
-        // Función para formatear moneda
-        function formatCurrency(amount) {
-            if (!amount) return 'N/A';
-            return new Intl.NumberFormat('es-CL', {
-                style: 'currency',
-                currency: 'CLP'
-            }).format(amount);
-        }
-
-        // Función para renderizar la tabla de cargas
-        function renderCargosTable(cargos) {
-            const tableBody = document.getElementById('cargos-table-body');
-            const cargoCount = document.getElementById('cargo-count');
+        // Función para renderizar la tabla de conductores
+        function renderDriversTable(drivers) {
+            const tableBody = document.getElementById('drivers-table-body');
+            const driverCount = document.getElementById('driver-count');
             
-            if (cargos.length === 0) {
+            if (drivers.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="loading">No se encontraron cargas en la base de datos</td>
+                        <td colspan="8" class="loading">No se encontraron conductores en la base de datos</td>
                     </tr>
                 `;
-                cargoCount.textContent = 'Total: 0 cargas';
+                driverCount.textContent = 'Total: 0 conductores';
                 return;
             }
             
             tableBody.innerHTML = '';
-            cargoCount.textContent = `Total: ${cargos.length} cargas`;
+            driverCount.textContent = `Total: ${drivers.length} conductores`;
             
-            cargos.forEach(cargo => {
+            drivers.forEach(driver => {
                 const row = document.createElement('tr');
                 
                 // USAR CAMPOS REALES DE LA BASE DE DATOS
-                const status = getCargoStatus(cargo.id); // Estado simulado
-                
                 let statusClass = '';
                 let statusText = '';
                 
-                switch (status) {
-                    case 'entregado':
-                        statusClass = 'entregado';
-                        statusText = 'Entregado';
-                        break;
-                    case 'transito':
-                        statusClass = 'transito';
-                        statusText = 'En tránsito';
-                        break;
-                    case 'cargado':
-                        statusClass = 'cargado';
-                        statusText = 'Cargado';
-                        break;
-                    case 'pendiente':
-                        statusClass = 'pendiente';
-                        statusText = 'Pendiente';
-                        break;
-                    default:
-                        statusClass = 'pendiente';
-                        statusText = 'Pendiente';
+                if (driver.activo) {
+                    statusClass = 'active';
+                    statusText = 'Activo';
+                } else {
+                    statusClass = 'inactive';
+                    statusText = 'Inactivo';
                 }
 
-                // Tipo basado en campo real 'tipo_carga'
-                let typeClass = '';
-                let typeText = cargo.tipo_carga || 'General';
-                
-                switch (cargo.tipo_carga?.toLowerCase()) {
-                    case 'peligrosa':
-                        typeClass = 'peligrosa';
-                        break;
-                    case 'refrigerada':
-                        typeClass = 'refrigerada';
-                        break;
-                    case 'frágil':
-                    case 'fragil':
-                        typeClass = 'fragil';
-                        break;
-                    default:
-                        typeClass = 'general';
-                }
-                
-                // Obtener nombre del cliente
-                const clienteNombre = cargo.cliente ? 
-                    (cargo.cliente_razon_social || cargo.cliente.razon_social || 'Cliente') : 
-                    'N/A';
+                // Vehículo asignado
+                const vehicleAssigned = driver.vehiculo_asignado ? 
+                    (driver.vehiculo_asignado_patente || driver.vehiculo_asignado.patente || 'Asignado') : 
+                    'Sin asignar';
                 
                 row.innerHTML = `
-                    <td>${cargo.id || 'N/A'}</td>
-                    <td>${cargo.descripcion || 'N/A'}</td>
-                    <td><span class="badge ${typeClass}">${typeText}</span></td>
-                    <td>${cargo.peso_kg ? cargo.peso_kg + ' kg' : 'N/A'}</td>
-                    <td>${cargo.volumen_m3 ? cargo.volumen_m3 + ' m³' : 'N/A'}</td>
-                    <td>${formatCurrency(cargo.valor_declarado)}</td>
-                    <td>${clienteNombre}</td>
+                    <td>${driver.nombre || 'N/A'}</td>
+                    <td>${driver.rut || 'N/A'}</td>
+                    <td>${driver.licencia || 'N/A'}</td>
+                    <td>${driver.telefono || 'N/A'}</td>
+                    <td>${driver.email || 'N/A'}</td>
+                    <td>${vehicleAssigned}</td>
                     <td><span class="badge ${statusClass}">${statusText}</span></td>
                     <td>
-                        <button class="action-btn" onclick="viewCargo(${cargo.id})">Ver</button>
-                        <button class="action-btn" onclick="window.location.href='/cargas/${cargo.id}/editar/'">Editar</button>
-                        <button class="action-btn delete" onclick="deleteCargo(${cargo.id})">Eliminar</button>
+                        <button class="action-btn" onclick="viewDriver(${driver.id})">Ver</button>
+                        <button class="action-btn" onclick="window.location.href='/conductores/${driver.id}/editar/'">Editar</button>
+                        <button class="action-btn delete" onclick="deleteDriver(${driver.id})">Eliminar</button>
                     </td>
                 `;
                 
@@ -902,111 +765,78 @@
             });
         }
 
-        // Función para filtrar cargas
-        function filterCargos() {
+        // Función para filtrar conductores
+        function filterDrivers() {
             const statusFilter = document.getElementById('filter-status').value;
-            const typeFilter = document.getElementById('filter-type').value;
             const searchText = document.getElementById('search-input').value.toLowerCase();
             
-            const filteredCargos = cargosData.filter(cargo => {
-                // Estado simulado
-                const status = getCargoStatus(cargo.id);
-                const matchesStatus = !statusFilter || status === statusFilter;
+            const filteredDrivers = driversData.filter(driver => {
+                // Filtro por estado (usando campo 'activo' real)
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && driver.activo) ||
+                    (statusFilter === 'inactive' && !driver.activo) ||
+                    (statusFilter === 'vacation' && !driver.activo);
                 
-                // Tipo real
-                const matchesType = !typeFilter || 
-                    (cargo.tipo_carga && cargo.tipo_carga.toLowerCase().includes(typeFilter.toLowerCase()));
-                
-                // Búsqueda
+                // Filtro por búsqueda
                 const matchesSearch = !searchText || 
-                    (cargo.descripcion && cargo.descripcion.toLowerCase().includes(searchText)) ||
-                    (cargo.cliente_razon_social && cargo.cliente_razon_social.toLowerCase().includes(searchText)) ||
-                    (cargo.id && cargo.id.toString().includes(searchText));
+                    (driver.nombre && driver.nombre.toLowerCase().includes(searchText)) ||
+                    (driver.rut && driver.rut.toLowerCase().includes(searchText)) ||
+                    (driver.licencia && driver.licencia.toLowerCase().includes(searchText)) ||
+                    (driver.email && driver.email.toLowerCase().includes(searchText));
                 
-                return matchesStatus && matchesType && matchesSearch;
+                return matchesStatus && matchesSearch;
             });
             
-            renderCargosTable(filteredCargos);
+            renderDriversTable(filteredDrivers);
         }
 
-        // Funciones de acción para las cargas
-        async function viewCargo(cargoId) {
+        // Funciones de acción para los conductores
+        async function viewDriver(driverId) {
             try {
-                const response = await fetch(`/api/cargas/${cargoId}/`);
-                const cargoDetails = await response.json();
+                const response = await fetch(`/api/conductores/${driverId}/`);
+                const driverDetails = await response.json();
                 
-                showNotification(`Viendo detalles de la carga ${cargoId}`);
-                
-                // Mostrar detalles en modal
-                document.getElementById('viewCargaTitle').textContent = `Detalles de Carga #${cargoId}`;
-                document.getElementById('viewCargaContent').innerHTML = `
-                    <div style="display: grid; gap: 1rem;">
-                        <div><strong>Descripción:</strong> ${cargoDetails.descripcion || 'N/A'}</div>
-                        <div><strong>Tipo:</strong> ${cargoDetails.tipo_carga || 'N/A'}</div>
-                        <div><strong>Peso:</strong> ${cargoDetails.peso_kg || 'N/A'} kg</div>
-                        <div><strong>Volumen:</strong> ${cargoDetails.volumen_m3 || 'N/A'} m³</div>
-                        <div><strong>Valor Declarado:</strong> ${formatCurrency(cargoDetails.valor_declarado)}</div>
-                        <div><strong>Cliente:</strong> ${cargoDetails.cliente_razon_social || 'N/A'}</div>
-                        <div><strong>Notas:</strong> ${cargoDetails.notas_especiales || 'Sin notas especiales'}</div>
-                    </div>
-                `;
-                showModal('viewCargaModal');
+                showNotification(`Viendo detalles del conductor ${driverId}`);
+                console.log('Detalles del conductor:', driverDetails);
                 
             } catch (error) {
                 console.error('Error al obtener detalles:', error);
-                showNotification('Error al cargar detalles de la carga');
+                showNotification('Error al cargar detalles del conductor');
             }
         }
 
-        async function editCargo(cargoId) {
-            showNotification(`Editando la carga ${cargoId}`);
-            // Redirigir a página de edición
-            window.location.href = `/cargas/${cargoId}/editar/`;
-        }
-
-        function deleteCargo(cargoId) {
-            if (confirm('¿Está seguro de que desea eliminar esta carga?')) {
-                window.location.href = `/cargas/${cargoId}/eliminar/`;
-            }
-        }
-
-        // FUNCIONES NUEVAS PARA CREAR CARGAS
-        async function loadClientesForSelect() {
-            try {
-                const response = await fetch('/api/clientes/');
-                if (response.ok) {
-                    const clientes = await response.json();
-                    const select = document.getElementById('cliente-select');
-                    
-                    // Limpiar opciones excepto la primera
-                    while (select.children.length > 1) {
-                        select.removeChild(select.lastChild);
-                    }
-                    
-                    // Agregar clientes activos
-                    clientes.forEach(cliente => {
-                        if (cliente.activo) {
-                            const option = document.createElement('option');
-                            option.value = cliente.id;
-                            option.textContent = cliente.razon_social || cliente.nombre || `Cliente ${cliente.id}`;
-                            select.appendChild(option);
+        async function deleteDriver(driverId) {
+            if (confirm('¿Está seguro de que desea eliminar este conductor?')) {
+                try {
+                    const response = await fetch(`/api/conductores/${driverId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
                         }
                     });
+                    
+                    if (response.ok) {
+                        await loadDriversFromDatabase();
+                        showNotification('Conductor eliminado correctamente');
+                    } else {
+                        throw new Error('Error al eliminar el conductor');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar el conductor');
                 }
-            } catch (error) {
-                console.error('Error al cargar clientes:', error);
-                // Si hay error, mostrar opciones de ejemplo
-                const select = document.getElementById('cliente-select');
-                const option = document.createElement('option');
-                option.value = "1";
-                option.textContent = "Cliente de Ejemplo";
-                select.appendChild(option);
             }
         }
 
-        async function createCarga(formData) {
+        // Funciones para el modal de nuevo conductor
+        function showNewDriverModal() {
+            showModal('newDriverModal');
+        }
+
+        async function createDriver(formData) {
             try {
-                const response = await fetch('/api/cargas/', {
+                const response = await fetch('/api/conductores/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1016,42 +846,48 @@
                 });
                 
                 if (response.ok) {
-                    const newCarga = await response.json();
-                    showNotification('Carga creada exitosamente');
-                    closeModal('newCargaModal');
-                    await loadCargosFromDatabase(); // Recargar la lista
-                    return newCarga;
+                    const newDriver = await response.json();
+                    showNotification('Conductor creado exitosamente');
+                    closeModal('newDriverModal');
+                    await loadDriversFromDatabase();
+                    return newDriver;
                 } else {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Error al crear la carga');
+                    throw new Error(errorData.detail || 'Error al crear el conductor');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification('Error al crear la carga: ' + error.message);
+                showNotification('Error al crear el conductor: ' + error.message);
                 throw error;
             }
         }
 
-        function handleCargaFormSubmit(e) {
+        function handleDriverFormSubmit(e) {
             e.preventDefault();
             
-            const form = e.target;
             const formData = {
-                descripcion: form.querySelector('input[name="descripcion"]').value,
-                tipo_carga: form.querySelector('select[name="tipo_carga"]').value,
-                peso_kg: parseFloat(form.querySelector('input[name="peso_kg"]').value),
-                volumen_m3: parseFloat(form.querySelector('input[name="volumen_m3"]').value),
-                valor_declarado: parseFloat(form.querySelector('input[name="valor_declarado"]').value),
-                cliente: form.querySelector('select[name="cliente"]').value,
-                notas_especiales: form.querySelector('textarea[name="notas_especiales"]').value
+                nombre: document.querySelector('input[name="nombre"]').value,
+                rut: document.querySelector('input[name="rut"]').value,
+                licencia: document.querySelector('input[name="licencia"]').value,
+                telefono: document.querySelector('input[name="telefono"]').value,
+                email: document.querySelector('input[name="email"]').value,
+                activo: document.querySelector('input[name="activo"]').checked
             };
             
-            createCarga(formData);
+            createDriver(formData);
         }
 
-        async function showNewCargaModal() {
-            await loadClientesForSelect();
-            showModal('newCargaModal');
+        // Funciones auxiliares para modals
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Resetear formulario
+            if (modalId === 'newDriverModal') {
+                document.getElementById('newDriverForm').reset();
+            }
         }
 
         // Función auxiliar para obtener el token CSRF
@@ -1071,20 +907,7 @@
             return cookieValue;
         }
 
-        // Modal Functions
-        function showModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            // Resetear formulario
-            if (modalId === 'newCargaModal') {
-                document.getElementById('newCargaForm').reset();
-            }
-        }
-
-        // Notification System
+        // Función para mostrar notificaciones
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.textContent = `✓ ${message}`;
@@ -1112,19 +935,16 @@
 
         // Inicialización cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
-            loadCargosFromDatabase();
+            loadDriversFromDatabase();
             
-            document.getElementById('filter-status').addEventListener('change', filterCargos);
-            document.getElementById('filter-type').addEventListener('change', filterCargos);
-            document.getElementById('search-input').addEventListener('input', filterCargos);
+            document.getElementById('filter-status').addEventListener('change', filterDrivers);
+            document.getElementById('search-input').addEventListener('input', filterDrivers);
             
-            // Actualizado para abrir el modal y cargar clientes
-            document.getElementById('new-cargo-btn').addEventListener('click', showNewCargaModal);
+            document.getElementById('new-driver-btn').addEventListener('click', showNewDriverModal);
             
-            // Agregar event listener para el formulario
-            document.getElementById('newCargaForm').addEventListener('submit', handleCargaFormSubmit);
+            document.getElementById('newDriverForm').addEventListener('submit', handleDriverFormSubmit);
             
-            console.log('📦 Módulo de Cargas cargado exitosamente');
+            console.log('👨‍💼 Módulo de Conductores cargado exitosamente');
         });
 
         // Estilos para las animaciones de notificaciones

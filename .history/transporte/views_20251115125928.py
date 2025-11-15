@@ -1494,10 +1494,14 @@ def eliminar_carga(request, pk):
             carga.delete()
             messages.success(request, 'Carga eliminada exitosamente')
             return redirect('cargas')
+                
         except Exception as e:
             messages.error(request, f'Error al eliminar la carga: {str(e)}')
+            return redirect('cargas')
     
-    context = {'carga': carga}
+    context = {
+        'carga': carga,
+    }
     return render(request, 'transporte/carga_confirm_delete.html', context)
 
 @login_required
@@ -1572,10 +1576,14 @@ def eliminar_seguro(request, pk):
             seguro.delete()
             messages.success(request, 'Seguro eliminado exitosamente')
             return redirect('seguros')
+                
         except Exception as e:
             messages.error(request, f'Error al eliminar el seguro: {str(e)}')
+            return redirect('seguros')
     
-    context = {'seguro': seguro}
+    context = {
+        'seguro': seguro,
+    }
     return render(request, 'transporte/seguro_confirm_delete.html', context)
 
 # En transporte/views.py - AGREGAR AL FINAL DEL ARCHIVO

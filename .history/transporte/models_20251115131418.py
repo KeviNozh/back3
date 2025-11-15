@@ -182,31 +182,3 @@ class PerfilUsuario(models.Model):
         return self.piloto_asignado.nombre if self.piloto_asignado else "-"
     piloto_nombre.short_description = 'Piloto'
 
-@receiver(post_save, sender=User)
-def crear_o_actualizar_perfil_usuario(sender, instance, created, **kwargs):
-    """
-    Signal para crear automáticamente el perfil de usuario cuando se crea un usuario
-    """
-    if created:
-        # Si es superusuario, asignar tipo ADMIN automáticamente
-        if instance.is_superuser:
-            tipo_usuario = 'ADMIN'
-        else:
-            tipo_usuario = 'CLIENTE'
-        
-        PerfilUsuario.objects.create(
-            usuario=instance,
-            tipo_usuario=tipo_usuario
-        )
-    else:
-        # Actualizar el perfil si el usuario se actualiza
-        try:
-            instance.perfilusuario.save()
-        except PerfilUsuario.DoesNotExist:
-            # Si el perfil no existe, crearlo
-            tipo_usuario = 'ADMIN' if instance.is_superuser else 'CLIENTE'
-            PerfilUsuario.objects.create(
-                usuario=instance,
-                tipo_usuario=tipo_usuario
-            )
-

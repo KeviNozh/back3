@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes - Sistema de Gestión de Transporte</title>
+    <title>Aeronaves - Sistema de Gestión de Transporte</title>
     <style>
-        /* Todos los estilos del dashboard original */
+        /* MANTENER TODOS LOS ESTILOS ORIGINALES EXACTAMENTE IGUAL */
         * {
             margin: 0;
             padding: 0;
@@ -313,34 +313,29 @@
             color: var(--success);
         }
 
+        .badge.maintenance {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
         .badge.inactive {
             background: rgba(239, 68, 68, 0.2);
             color: var(--danger);
         }
 
-        .badge.empresa {
+        .badge.cargo {
             background: rgba(59, 130, 246, 0.2);
             color: var(--info);
         }
 
-        .badge.individual {
+        .badge.passenger {
             background: rgba(139, 92, 246, 0.2);
             color: #a78bfa;
         }
 
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-        }
-
-        .error {
-            text-align: center;
-            padding: 2rem;
-            color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
-            border-radius: 12px;
-            margin: 1rem 0;
+        .badge.mixed {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
         }
 
         .pagination {
@@ -407,6 +402,21 @@
             color: white;
         }
 
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -453,7 +463,7 @@
             font-weight: 600;
         }
 
-        .form-input, .form-select, .form-textarea {
+        .form-input, .form-select {
             width: 100%;
             padding: 0.8rem 1rem;
             background: rgba(30, 41, 59, 0.6);
@@ -463,14 +473,9 @@
             font-size: 0.95rem;
         }
 
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
+        .form-input:focus, .form-select:focus {
             outline: none;
             border-color: var(--primary);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
         }
 
         .form-row {
@@ -536,7 +541,7 @@
     <div class="container">
         <div class="header">
             <div class="logo">
-                <div class="logo-icon">👥</div>
+                <div class="logo-icon">✈️</div>
                 <span>Logística Global</span>
             </div>
             <div class="user-info">
@@ -561,404 +566,279 @@
             <div class="nav-item" onclick="window.location.href='{% url 'despachos' %}'">📦 Despachos</div>
             <div class="nav-item" onclick="window.location.href='{% url 'rutas' %}'">🗺️ Rutas</div>
             <div class="nav-item" onclick="window.location.href='{% url 'vehiculos' %}'">🚛 Vehículos</div>
-            <div class="nav-item" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
+            <div class="nav-item active" onclick="window.location.href='{% url 'aeronaves' %}'">✈️ Aeronaves</div>
             <div class="nav-item" onclick="window.location.href='{% url 'conductores' %}'">👨‍💼 Conductores</div>
             <div class="nav-item" onclick="window.location.href='{% url 'pilotos' %}'">👨‍✈️ Pilotos</div>
-            <div class="nav-item active" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
+            <div class="nav-item" onclick="window.location.href='{% url 'clientes' %}'">👥 Clientes</div>
             <div class="nav-item" onclick="window.location.href='{% url 'cargas' %}'">📦 Cargas</div>
             <div class="nav-item" onclick="window.location.href='{% url 'seguros' %}'">🛡️ Seguros</div>
             <div class="nav-item" onclick="window.location.href='{% url 'reportes' %}'">📈 Reportes</div>
             <div class="nav-item" onclick="window.location.href='{% url 'api' %}'">🔗 API</div>
         </div>
 
+        <!-- BLOQUE DE PERMISOS PARA NO-ADMIN -->
+        {% if user.is_authenticated and user.perfilusuario.tipo_usuario != 'ADMIN' %}
+        <style>
+            #new-aircraft-btn,
+            .btn[onclick*="crear"],
+            .btn[onclick*="editar"],
+            .btn[onclick*="eliminar"],
+            .action-btn.delete,
+            .btn-danger {
+                display: none !important;
+            }
+        </style>
+        
+        <div style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+                <span>🔒</span>
+                <div>
+                    <strong>Modo Solo Lectura</strong>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">
+                        Como {{ user.perfilusuario.tipo_usuario|title }}, solo puedes visualizar información de aeronaves.
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Mensajes del sistema -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
         <div class="page-title">
-            <span>👥</span>
-            <span>Gestión de Clientes</span>
+            <span>✈️</span>
+            <span>Gestión de Aeronaves</span>
         </div>
 
         <div class="filters">
             <div class="filter-group">
                 <select class="filter-select" id="filter-status">
                     <option value="">Todos los estados</option>
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
+                    <option value="active">Activa</option>
+                    <option value="maintenance">En Mantenimiento</option>
+                    <option value="inactive">Inactiva</option>
                 </select>
                 <select class="filter-select" id="filter-type">
                     <option value="">Todos los tipos</option>
-                    <option value="empresa">Empresa</option>
-                    <option value="individual">Individual</option>
+                    <option value="cargo">Carga</option>
+                    <option value="passenger">Pasajeros</option>
+                    <option value="mixed">Mixto</option>
                 </select>
             </div>
-            <input type="text" class="search-input" id="search-input" placeholder="Buscar cliente...">
-            <button class="btn" id="new-client-btn">➕ Nuevo Cliente</button>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar aeronave...">
+            {% if user.perfilusuario.tipo_usuario == 'ADMIN' or user.is_superuser %}
+            <button class="btn" id="new-aircraft-btn" onclick="showNewAircraftModal()">➕ Nueva Aeronave</button>
+            {% endif %}
         </div>
 
         <div class="table-container">
             <div class="table-header">
-                <div class="table-title">Lista de Clientes</div>
-                <div id="client-count" style="color: var(--text-secondary); font-size: 0.9rem;">Cargando...</div>
+                <div class="table-title">Lista de Aeronaves</div>
+                <div id="aircraft-count" style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Total: {{ aeronaves.count }} aeronaves
+                </div>
             </div>
+            
+            {% if aeronaves %}
             <table class="table">
                 <thead>
                     <tr>
-                        <th>RUT</th>
-                        <th>Razón Social/Nombre</th>
+                        <th>Matrícula</th>
+                        <th>Modelo</th>
                         <th>Tipo</th>
-                        <th>Persona de Contacto</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
+                        <th>Capacidad</th>
+                        <th>Piloto Asignado</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="clients-table-body">
+                <tbody id="aircraft-table-body">
+                    {% for aeronave in aeronaves %}
                     <tr>
-                        <td colspan="8" class="loading">Cargando datos de clientes desde la base de datos...</td>
+                        <td><strong>{{ aeronave.matricula }}</strong></td>
+                        <td>{{ aeronave.modelo }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if aeronave.tipo_aeronave == 'Carga' %}cargo
+                                {% elif aeronave.tipo_aeronave == 'Pasajeros' %}passenger
+                                {% else %}mixed
+                                {% endif %}">
+                                {{ aeronave.tipo_aeronave }}
+                            </span>
+                        </td>
+                        <td>{{ aeronave.capacidad_kg }} kg</td>
+                        <td>
+                            {% if aeronave.piloto_asignado %}
+                                {{ aeronave.piloto_asignado.nombre }}
+                            {% else %}
+                                <span style="color: var(--text-secondary);">Sin asignar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if aeronave.activo %}active{% else %}inactive{% endif %}">
+                                {% if aeronave.activo %}Activa{% else %}Inactiva{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn" onclick="viewAircraft({{ aeronave.id }})">Ver</button>
+                            {% if user.perfilusuario.tipo_usuario == 'ADMIN' or user.is_superuser %}
+                            <button class="action-btn" onclick="editAircraft({{ aeronave.id }})">Editar</button>
+                            <button class="action-btn delete" onclick="deleteAircraft({{ aeronave.id }})">Eliminar</button>
+                            {% endif %}
+                        </td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
+            {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">✈️</div>
+                <h3>No hay aeronaves registradas</h3>
+                <p>Comienza agregando la primera aeronave a la flota.</p>
+                {% if user.perfilusuario.tipo_usuario == 'ADMIN' or user.is_superuser %}
+                <button class="btn" onclick="showNewAircraftModal()" style="margin-top: 1rem;">
+                    ➕ Agregar Primera Aeronave
+                </button>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Modal para nuevo cliente -->
-    <div id="newClientModal" class="modal">
+    <!-- Modal para crear nueva aeronave -->
+    <div id="newAircraftModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('newClientModal')">&times;</span>
-            <h3>Nuevo Cliente</h3>
-            <form id="newClientForm">
+            <span class="close-modal" onclick="closeModal('newAircraftModal')">&times;</span>
+            <h3>Nueva Aeronave</h3>
+            <form id="newAircraftForm" method="POST" action="{% url 'aeronave_crear' %}">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Matrícula</label>
+                        <input type="text" class="form-input" name="matricula" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Aeronave</label>
+                        <select class="form-select" name="tipo_aeronave" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Carga">Carga</option>
+                            <option value="Pasajeros">Pasajeros</option>
+                            <option value="Mixto">Mixto</option>
+                            <option value="Privado">Privado</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Modelo</label>
+                        <input type="text" class="form-input" name="modelo" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Capacidad (kg)</label>
+                        <input type="number" class="form-input" name="capacidad_kg" required min="0">
+                    </div>
+                </div>
+                
                 <div class="form-group">
-                    <label class="form-label">Tipo de Cliente</label>
-                    <select class="form-select" name="tipo_cliente" id="tipo-cliente-select" required>
-                        <option value="">Seleccionar tipo</option>
-                        <option value="EMPRESA">Empresa</option>
-                        <option value="INDIVIDUAL">Individual</option>
+                    <label class="form-label">Piloto Asignado</label>
+                    <select class="form-select" name="piloto_asignado" id="piloto-select">
+                        <option value="">Sin asignar</option>
+                        {% for piloto in pilotos %}
+                        <option value="{{ piloto.id }}">{{ piloto.nombre }} ({{ piloto.certificacion }})</option>
+                        {% endfor %}
                     </select>
                 </div>
-
-                <div id="empresa-fields">
-                    <div class="form-group">
-                        <label class="form-label">Razón Social</label>
-                        <input type="text" class="form-input" name="razon_social">
-                    </div>
-                </div>
-
-                <div id="individual-fields" style="display: none;">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" class="form-input" name="nombre">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Apellido</label>
-                            <input type="text" class="form-input" name="apellido">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">RUT</label>
-                        <input type="text" class="form-input" name="rut" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Persona de Contacto</label>
-                        <input type="text" class="form-input" name="persona_contacto" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Teléfono</label>
-                        <input type="text" class="form-input" name="telefono" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" name="email" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Dirección</label>
-                    <textarea class="form-textarea" name="direccion" required></textarea>
-                </div>
-
+                
                 <div class="form-group">
                     <label class="form-label">
-                        <input type="checkbox" name="activo" checked> Activo
+                        <input type="checkbox" name="activo" checked> Activa
                     </label>
                 </div>
-
+                
                 <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('newClientModal')">Cancelar</button>
-                    <button type="submit" class="btn">Crear Cliente</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newAircraftModal')">Cancelar</button>
+                    <button type="submit" class="btn">Crear Aeronave</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // Variable global para almacenar los clientes
-        let clientsData = [];
-
-        // Función para cargar clientes desde la base de datos
-        async function loadClientsFromDatabase() {
-            try {
-                showLoadingState();
-                
-                const response = await fetch('/api/clientes/');
-                
-                if (!response.ok) {
-                    throw new Error('Error al cargar los clientes');
-                }
-                
-                clientsData = await response.json();
-                renderClientsTable(clientsData);
-                showNotification('Datos de clientes cargados correctamente');
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showErrorState('Error al cargar los clientes: ' + error.message);
-            }
-        }
-
-        // Función para mostrar estado de carga
-        function showLoadingState() {
-            const tableBody = document.getElementById('clients-table-body');
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="loading">Cargando datos de clientes desde la base de datos...</td>
-                </tr>
-            `;
-            document.getElementById('client-count').textContent = 'Cargando...';
-        }
-
-        // Función para mostrar estado de error
-        function showErrorState(message) {
-            const tableBody = document.getElementById('clients-table-body');
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="8">
-                        <div class="error">
-                            ${message}
-                            <br>
-                            <button class="btn" onclick="loadClientsFromDatabase()" style="margin-top: 1rem;">
-                                Reintentar
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            document.getElementById('client-count').textContent = 'Error';
-        }
-
-        // Función para renderizar la tabla de clientes
-        function renderClientsTable(clients) {
-            const tableBody = document.getElementById('clients-table-body');
-            const clientCount = document.getElementById('client-count');
+        // Funciones básicas de filtrado
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterStatus = document.getElementById('filter-status');
+            const filterType = document.getElementById('filter-type');
+            const searchInput = document.getElementById('search-input');
             
-            if (clients.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="loading">No se encontraron clientes en la base de datos</td>
-                    </tr>
-                `;
-                clientCount.textContent = 'Total: 0 clientes';
-                return;
-            }
-            
-            tableBody.innerHTML = '';
-            clientCount.textContent = `Total: ${clients.length} clientes`;
-            
-            clients.forEach(client => {
-                const row = document.createElement('tr');
+            function filterTable() {
+                const statusValue = filterStatus.value;
+                const typeValue = filterType.value;
+                const searchValue = searchInput.value.toLowerCase();
                 
-                // Estado basado en campo 'activo'
-                const statusClass = client.activo ? 'active' : 'inactive';
-                const statusText = client.activo ? 'Activo' : 'Inactivo';
+                const rows = document.querySelectorAll('tbody tr');
+                let visibleCount = 0;
                 
-                // Tipo de cliente
-                const typeClass = client.tipo_cliente === 'EMPRESA' ? 'empresa' : 'individual';
-                const typeText = client.tipo_cliente === 'EMPRESA' ? 'Empresa' : 'Individual';
-                
-                // Nombre/razón social
-                const nombreDisplay = client.tipo_cliente === 'EMPRESA' ? 
-                    client.razon_social : 
-                    `${client.nombre} ${client.apellido}`;
-                
-                row.innerHTML = `
-                    <td>${client.rut || 'N/A'}</td>
-                    <td>${nombreDisplay || 'N/A'}</td>
-                    <td><span class="badge ${typeClass}">${typeText}</span></td>
-                    <td>${client.persona_contacto || 'N/A'}</td>
-                    <td>${client.telefono || 'N/A'}</td>
-                    <td>${client.email || 'N/A'}</td>
-                    <td><span class="badge ${statusClass}">${statusText}</span></td>
-                    <td>
-                        <button class="action-btn" onclick="viewClient(${client.id})">Ver</button>
-                        <button class="action-btn" onclick="editClient(${client.id})">Editar</button>
-                        <button class="action-btn delete" onclick="deleteClient(${client.id})">Eliminar</button>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Función para filtrar clientes
-        function filterClients() {
-            const statusFilter = document.getElementById('filter-status').value;
-            const typeFilter = document.getElementById('filter-type').value;
-            const searchText = document.getElementById('search-input').value.toLowerCase();
-            
-            const filteredClients = clientsData.filter(client => {
-                // Filtro por estado
-                const matchesStatus = !statusFilter || 
-                    (statusFilter === 'active' && client.activo) ||
-                    (statusFilter === 'inactive' && !client.activo);
-                
-                // Filtro por tipo
-                const matchesType = !typeFilter || 
-                    (typeFilter === 'empresa' && client.tipo_cliente === 'EMPRESA') ||
-                    (typeFilter === 'individual' && client.tipo_cliente === 'INDIVIDUAL');
-                
-                // Filtro por búsqueda
-                const matchesSearch = !searchText || 
-                    (client.rut && client.rut.toLowerCase().includes(searchText)) ||
-                    (client.razon_social && client.razon_social.toLowerCase().includes(searchText)) ||
-                    (client.nombre && client.nombre.toLowerCase().includes(searchText)) ||
-                    (client.persona_contacto && client.persona_contacto.toLowerCase().includes(searchText)) ||
-                    (client.email && client.email.toLowerCase().includes(searchText));
-                
-                return matchesStatus && matchesType && matchesSearch;
-            });
-            
-            renderClientsTable(filteredClients);
-        }
-
-        // Funciones de acción para los clientes
-        async function viewClient(clientId) {
-            try {
-                const response = await fetch(`/api/clientes/${clientId}/`);
-                const clientDetails = await response.json();
-                
-                showNotification(`Viendo detalles del cliente ${clientId}`);
-                console.log('Detalles del cliente:', clientDetails);
-                
-            } catch (error) {
-                console.error('Error al obtener detalles:', error);
-                showNotification('Error al cargar detalles del cliente');
-            }
-        }
-
-        async function editClient(clientId) {
-            showNotification(`Editando el cliente ${clientId}`);
-            // Redirigir a página de edición
-            window.location.href = `/clientes/${clientId}/editar/`;
-        }
-
-        function deleteClient(clientId) {
-            if (confirm('¿Está seguro de que desea eliminar este cliente?')) {
-                window.location.href = `/clientes/${clientId}/eliminar/`;
-            }
-        }
-
-        // Funciones para el modal de nuevo cliente
-        function showNewClientModal() {
-            showModal('newClientModal');
-        }
-
-        async function createClient(formData) {
-            try {
-                const response = await fetch('/api/clientes/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCSRFToken()
-                    },
-                    body: JSON.stringify(formData)
+                rows.forEach(row => {
+                    const status = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
+                    const type = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                    const matricula = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                    const modelo = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                    const piloto = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                    
+                    const matchesStatus = !statusValue || 
+                        (statusValue === 'active' && status.includes('activa')) ||
+                        (statusValue === 'inactive' && status.includes('inactiva')) ||
+                        (statusValue === 'maintenance' && status.includes('mantenimiento'));
+                        
+                    const matchesType = !typeValue || type.includes(typeValue.toLowerCase());
+                    const matchesSearch = !searchValue || 
+                        matricula.includes(searchValue) || 
+                        modelo.includes(searchValue) ||
+                        piloto.includes(searchValue);
+                    
+                    if (matchesStatus && matchesType && matchesSearch) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
                 });
                 
-                if (response.ok) {
-                    const newClient = await response.json();
-                    showNotification('Cliente creado exitosamente');
-                    closeModal('newClientModal');
-                    await loadClientsFromDatabase();
-                    return newClient;
-                } else {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Error al crear el cliente');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('Error al crear el cliente: ' + error.message);
-                throw error;
-            }
-        }
-
-        function handleClientFormSubmit(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const formData = {
-                tipo_cliente: form.querySelector('select[name="tipo_cliente"]').value,
-                rut: form.querySelector('input[name="rut"]').value,
-                persona_contacto: form.querySelector('input[name="persona_contacto"]').value,
-                telefono: form.querySelector('input[name="telefono"]').value,
-                email: form.querySelector('input[name="email"]').value,
-                direccion: form.querySelector('textarea[name="direccion"]').value,
-                activo: form.querySelector('input[name="activo"]').checked
-            };
-
-            // Agregar campos específicos según el tipo
-            if (formData.tipo_cliente === 'EMPRESA') {
-                formData.razon_social = form.querySelector('input[name="razon_social"]').value;
-                formData.nombre = null;
-                formData.apellido = null;
-            } else {
-                formData.razon_social = null;
-                formData.nombre = form.querySelector('input[name="nombre"]').value;
-                formData.apellido = form.querySelector('input[name="apellido"]').value;
+                document.getElementById('aircraft-count').textContent = `Total: ${visibleCount} aeronaves`;
             }
             
-            createClient(formData);
+            filterStatus.addEventListener('change', filterTable);
+            filterType.addEventListener('change', filterTable);
+            searchInput.addEventListener('input', filterTable);
+        });
+
+        function viewAircraft(id) {
+            window.location.href = `/aeronaves/${id}/`;
         }
 
-        // Función para manejar cambio de tipo de cliente
-        function handleTipoClienteChange() {
-            const tipo = document.getElementById('tipo-cliente-select').value;
-            const empresaFields = document.getElementById('empresa-fields');
-            const individualFields = document.getElementById('individual-fields');
-            
-            if (tipo === 'EMPRESA') {
-                empresaFields.style.display = 'block';
-                individualFields.style.display = 'none';
-            } else if (tipo === 'INDIVIDUAL') {
-                empresaFields.style.display = 'none';
-                individualFields.style.display = 'block';
-            } else {
-                empresaFields.style.display = 'none';
-                individualFields.style.display = 'none';
-            }
+        function editAircraft(id) {
+            window.location.href = `/aeronaves/${id}/editar/`;
         }
 
-        // Función auxiliar para obtener el token CSRF
-        function getCSRFToken() {
-            const name = 'csrftoken';
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+        function deleteAircraft(id) {
+    if (confirm('¿Está seguro de que desea eliminar esta aeronave?')) {
+        window.location.href = `/aeronaves/${id}/eliminar/`;
+    }
+}
+
+        // Funciones para el modal de nueva aeronave
+        function showNewAircraftModal() {
+            showModal('newAircraftModal');
         }
 
-        // Modal Functions
+        // Funciones auxiliares para modals
         function showModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
         }
@@ -966,29 +846,44 @@
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
             // Resetear formulario
-            if (modalId === 'newClientModal') {
-                document.getElementById('newClientForm').reset();
-                document.getElementById('empresa-fields').style.display = 'block';
-                document.getElementById('individual-fields').style.display = 'none';
+            if (modalId === 'newAircraftModal') {
+                document.getElementById('newAircraftForm').reset();
             }
         }
 
-        // Notification System
-        function showNotification(message) {
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            notification.textContent = `✓ ${message}`;
+            
+            let backgroundColor = 'linear-gradient(135deg, #10b981, #059669)';
+            let icon = '✓';
+            
+            if (type === 'error') {
+                backgroundColor = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                icon = '❌';
+            } else if (type === 'warning') {
+                backgroundColor = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                icon = '⚠️';
+            } else if (type === 'info') {
+                backgroundColor = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                icon = 'ℹ️';
+            }
+            
+            notification.innerHTML = `<span style="margin-right: 8px;">${icon}</span>${message}`;
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: linear-gradient(135deg, #6366f1, #06b6d4);
+                background: ${backgroundColor};
                 color: white;
                 padding: 1rem 2rem;
                 border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
                 z-index: 1000;
                 animation: slideInRight 0.4s ease-out;
                 font-weight: 600;
+                display: flex;
+                align-items: center;
             `;
             
             document.body.appendChild(notification);
@@ -996,25 +891,8 @@
             setTimeout(() => {
                 notification.style.animation = 'slideOutRight 0.4s ease-out';
                 setTimeout(() => notification.remove(), 400);
-            }, 3000);
+            }, 4000);
         }
-
-        // Inicialización cuando se carga la página
-        document.addEventListener('DOMContentLoaded', function() {
-            loadClientsFromDatabase();
-            
-            document.getElementById('filter-status').addEventListener('change', filterClients);
-            document.getElementById('filter-type').addEventListener('change', filterClients);
-            document.getElementById('search-input').addEventListener('input', filterClients);
-            
-            document.getElementById('new-client-btn').addEventListener('click', showNewClientModal);
-            
-            document.getElementById('newClientForm').addEventListener('submit', handleClientFormSubmit);
-            
-            document.getElementById('tipo-cliente-select').addEventListener('change', handleTipoClienteChange);
-            
-            console.log('👥 Módulo de Clientes cargado exitosamente');
-        });
 
         // Estilos para las animaciones de notificaciones
         const style = document.createElement('style');
@@ -1051,6 +929,8 @@
                 }
             });
         }
+
+        console.log('✈️ Módulo de Aeronaves cargado exitosamente');
     </script>
 </body>
 </html>

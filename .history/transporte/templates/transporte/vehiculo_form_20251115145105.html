@@ -1,0 +1,68 @@
+    {% extends 'base.html' %}
+
+    {% block title %}Nuevo Vehículo - Logística Global{% endblock %}
+
+    {% block content %}
+    <div class="page-title">
+        <span>🚛</span>
+        <span>Nuevo Vehículo</span>
+    </div>
+
+    <div class="content-card">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Patente *</label>
+                <input type="text" class="form-input" name="patente" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Tipo de Vehículo *</label>
+                <select class="form-select" name="tipo_vehiculo" required>
+                    <option value="">Seleccionar tipo</option>
+                    <option value="Camión">Camión</option>
+                    <option value="Furgón">Furgón</option>
+                    <option value="Van">Van</option>
+                    <option value="Trailer">Trailer</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Modelo *</label>
+                <input type="text" class="form-input" name="modelo" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Capacidad (kg) *</label>
+                <input type="number" class="form-input" name="capacidad_kg" required min="0">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Año *</label>
+                <input type="number" class="form-input" name="año" required min="1900" max="2030">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Conductor Asignado</label>
+                <select class="form-select" name="conductor_asignado">
+                    <option value="">Sin asignar</option>
+                    {% for conductor in conductores %}
+                    <option value="{{ conductor.id }}">{{ conductor.nombre }} ({{ conductor.licencia }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <input type="checkbox" name="activo" checked> Activo
+                </label>
+            </div>
+            
+            <div class="action-buttons">
+                <button type="submit" class="btn">Crear Vehículo</button>
+                <a href="{% url 'vehiculos' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+    {% endblock %}

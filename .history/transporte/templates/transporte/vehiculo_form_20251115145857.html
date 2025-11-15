@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Nuevo Vehículo - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>🚛</span>
+    <span>Nuevo Vehículo</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label">Patente *</label>
+            <input type="text" class="form-input" name="patente" maxlength="10" required 
+                   placeholder="Máximo 10 caracteres">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Tipo de Vehículo *</label>
+            <select class="form-select" name="tipo_vehiculo" required>
+                <option value="">Seleccionar tipo</option>
+                <option value="Camión">Camión</option>
+                <option value="Furgoneta">Furgoneta</option>
+                <option value="Camioneta">Camioneta</option>
+                <option value="Trailer">Trailer</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Modelo *</label>
+            <input type="text" class="form-input" name="modelo" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Capacidad (kg) *</label>
+            <input type="number" class="form-input" name="capacidad_kg" required min="0">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Año *</label>
+            <input type="number" class="form-input" name="año" required min="1900" max="{% now 'Y' %}">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Conductor Asignado</label>
+            <select class="form-select" name="conductor_asignado" id="conductor-select">
+                <option value="">Sin asignar</option>
+                {% for conductor in conductores %}
+                <option value="{{ conductor.id }}">{{ conductor.nombre }} ({{ conductor.licencia }})</option>
+                {% endfor %}
+            </select>
+            {% if not conductores %}
+            <div style="color: var(--warning); font-size: 0.9rem; margin-top: 0.5rem;">
+                ⚠️ No hay conductores disponibles. Primero crea conductores en la sección correspondiente.
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" checked> Activo
+            </label>
+        </div>
+        
+        <div class="action-buttons">
+            <button type="submit" class="btn">Crear Vehículo</button>
+            <a href="{% url 'vehiculos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+console.log("🔍 VEHICULO_FORM - Conductores disponibles: {{ conductores|length }}");
+document.addEventListener('DOMContentLoaded', function() {
+    const conductorSelect = document.getElementById('conductor-select');
+    console.log("🔍 Opciones en select:", conductorSelect.options.length);
+});
+</script>
+{% endblock %}

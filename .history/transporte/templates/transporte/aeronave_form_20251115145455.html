@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Aeronave - Logística Global{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <span>✈️</span>
+    <span>Nueva Aeronave</span>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label">Matrícula *</label>
+            <input type="text" class="form-input" name="matricula" maxlength="10" required 
+                   placeholder="Máximo 10 caracteres">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Tipo de Aeronave *</label>
+            <select class="form-select" name="tipo_aeronave" required>
+                <option value="">Seleccionar tipo</option>
+                <option value="Carga">Carga</option>
+                <option value="Pasajeros">Pasajeros</option>
+                <option value="Mixto">Mixto</option>
+                <option value="Privado">Privado</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Modelo *</label>
+            <input type="text" class="form-input" name="modelo" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Capacidad (kg) *</label>
+            <input type="number" class="form-input" name="capacidad_kg" required min="0">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Piloto Asignado</label>
+            <select class="form-select" name="piloto_asignado">
+                <option value="">Sin asignar</option>
+                {% for piloto in pilotos %}
+                <option value="{{ piloto.id }}">{{ piloto.nombre }} ({{ piloto.certificacion }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" name="activo" checked> Activa
+            </label>
+        </div>
+        
+        <div class="action-buttons">
+            <button type="submit" class="btn">Crear Aeronave</button>
+            <a href="{% url 'aeronaves' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+console.log("🔍 AERONAVE_FORM - Pilotos disponibles: {{ pilotos|length }}");
+</script>
+{% endblock %}
